@@ -47,8 +47,8 @@ const Reports: React.FC = () => {
       <Typography variant="h4" sx={{ mb: 4 }}>
         Recruitment Reports
       </Typography>
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
+      <Grid container component="div" spacing={3} sx={{ mb: 4 }}>
+        <Grid item component="div" xs={12} sm={6} md={3}>
           <Card sx={{ cursor: 'pointer' }} onClick={() => navigate('/candidates')}>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>Total Candidates</Typography>
@@ -56,7 +56,7 @@ const Reports: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item component="div" xs={12} sm={6} md={3}>
           <Card sx={{ cursor: 'pointer' }} onClick={() => navigate('/interviews')}>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>Interviews Scheduled</Typography>
@@ -64,7 +64,7 @@ const Reports: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item component="div" xs={12} sm={6} md={3}>
           <Card sx={{ cursor: 'pointer' }} onClick={() => navigate('/candidates?status=Hired')}>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>Hired</Typography>
@@ -72,7 +72,7 @@ const Reports: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item component="div" xs={12} sm={6} md={3}>
           <Card sx={{ cursor: 'pointer' }} onClick={() => navigate('/candidates?status=Pending Review')}>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>Pending Review</Typography>
@@ -81,8 +81,8 @@ const Reports: React.FC = () => {
           </Card>
         </Grid>
       </Grid>
-      <Grid container spacing={3} sx={{ mt: 2 }}>
-        <Grid item xs={12} md={6}>
+      <Grid container component="div" spacing={3} sx={{ mt: 2 }}>
+        <Grid item component="div" xs={12} md={6}>
           <Paper sx={{ p: 3, width: '100%' }}>
             <Typography variant="h6" sx={{ mb: 2 }}>Top Positions</Typography>
             <TableContainer>
@@ -107,7 +107,7 @@ const Reports: React.FC = () => {
             </TableContainer>
           </Paper>
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid item component="div" xs={12} md={6}>
           <Paper sx={{ p: 3, width: '100%' }}>
             <Typography variant="h6" sx={{ mb: 2 }}>Recent Hires</Typography>
             <TableContainer>

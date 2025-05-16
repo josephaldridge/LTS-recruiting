@@ -1,0 +1,4 @@
+# Ignore environment variables and secrets
+.env
+server/src/config/firebase-service-account.json
+node_modules/ 

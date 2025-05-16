@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -13,79 +13,78 @@ import {
   TableRow,
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-// Mock data - would come from API
-const mockHiringStats = {
-  totalApplications: 156,
-  interviewsConducted: 42,
-  offersMade: 35,
-  hiresCompleted: 28,
-  averageTimeToHire: '14 days',
-  positionsOpen: 12,
-};
-
-const mockTopPositions = [
-  { position: 'Tax Preparer', applications: 85, hired: 15 },
-  { position: 'Customer Service', applications: 45, hired: 8 },
-  { position: 'Office Manager', applications: 26, hired: 5 },
-];
-
-const mockRecentHires = [
-  { name: 'John Doe', position: 'Tax Preparer', startDate: '2024-02-01' },
-  { name: 'Jane Smith', position: 'Customer Service', startDate: '2024-02-05' },
-  { name: 'Mike Johnson', position: 'Tax Preparer', startDate: '2024-02-10' },
-];
-
-const StatCard: React.FC<{
-  title: string;
-  value: string | number;
-  subtitle?: string;
-}> = ({ title, value, subtitle }) => (
-  <Card sx={{ height: '100%' }}>
-    <CardContent>
-      <Typography color="text.secondary" gutterBottom>
-        {title}
-      </Typography>
-      <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-        {value}
-      </Typography>
-      {subtitle && (
-        <Typography variant="body2" color="text.secondary">
-          {subtitle}
-        </Typography>
-      )}
-    </CardContent>
-  </Card>
-);
+const API_BASE = process.env.REACT_APP_API_URL || '';
 
 const Reports: React.FC = () => {
+  const [stats, setStats] = useState<any>({});
+  const [topPositions, setTopPositions] = useState<any[]>([]);
+  const [recentHires, setRecentHires] = useState<any[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const statsRes = await axios.get(`${API_BASE}/api/reports/stats`);
+        setStats(statsRes.data);
+        const topRes = await axios.get(`${API_BASE}/api/reports/top-positions`);
+        setTopPositions(topRes.data);
+        const hiresRes = await axios.get(`${API_BASE}/api/reports/recent-hires`);
+        setRecentHires(hiresRes.data);
+      } catch (err) {
+        setStats({});
+        setTopPositions([]);
+        setRecentHires([]);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <Box>
       <Typography variant="h4" sx={{ mb: 4 }}>
         Recruitment Reports
       </Typography>
-
-      <Grid container spacing={3}>
-        <Box sx={{ flexBasis: { xs: '100%', sm: '50%', md: '25%' }, p: 1, display: 'flex' }}>
-          <StatCard title="Total Applications" value={mockHiringStats.totalApplications} />
-        </Box>
-        <Box sx={{ flexBasis: { xs: '100%', sm: '50%', md: '25%' }, p: 1, display: 'flex' }}>
-          <StatCard title="Interviews Conducted" value={mockHiringStats.interviewsConducted} />
-        </Box>
-        <Box sx={{ flexBasis: { xs: '100%', sm: '50%', md: '25%' }, p: 1, display: 'flex' }}>
-          <StatCard title="Offers Made" value={mockHiringStats.offersMade} />
-        </Box>
-        <Box sx={{ flexBasis: { xs: '100%', sm: '50%', md: '25%' }, p: 1, display: 'flex' }}>
-          <StatCard title="Hires Completed" value={mockHiringStats.hiresCompleted} />
-        </Box>
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ cursor: 'pointer' }} onClick={() => navigate('/candidates')}>
+            <CardContent>
+              <Typography color="text.secondary" gutterBottom>Total Candidates</Typography>
+              <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>{stats.totalApplications ?? '-'}</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ cursor: 'pointer' }} onClick={() => navigate('/interviews')}>
+            <CardContent>
+              <Typography color="text.secondary" gutterBottom>Interviews Scheduled</Typography>
+              <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>{stats.interviewsConducted ?? '-'}</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ cursor: 'pointer' }} onClick={() => navigate('/candidates?status=Hired')}>
+            <CardContent>
+              <Typography color="text.secondary" gutterBottom>Hired</Typography>
+              <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>{stats.hiresCompleted ?? '-'}</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ cursor: 'pointer' }} onClick={() => navigate('/candidates?status=Pending Review')}>
+            <CardContent>
+              <Typography color="text.secondary" gutterBottom>Pending Review</Typography>
+              <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>{stats.pendingReview ?? '-'}</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
       </Grid>
-
       <Grid container spacing={3} sx={{ mt: 2 }}>
-        <Box sx={{ flexBasis: { xs: '100%', md: '50%' }, p: 1, display: 'flex' }}>
+        <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3, width: '100%' }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Top Positions
-            </Typography>
+            <Typography variant="h6" sx={{ mb: 2 }}>Top Positions</Typography>
             <TableContainer>
               <Table>
                 <TableHead>
@@ -96,7 +95,7 @@ const Reports: React.FC = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {mockTopPositions.map((row) => (
+                  {topPositions.map((row: any) => (
                     <TableRow key={row.position}>
                       <TableCell>{row.position}</TableCell>
                       <TableCell align="right">{row.applications}</TableCell>
@@ -107,12 +106,10 @@ const Reports: React.FC = () => {
               </Table>
             </TableContainer>
           </Paper>
-        </Box>
-        <Box sx={{ flexBasis: { xs: '100%', md: '50%' }, p: 1, display: 'flex' }}>
+        </Grid>
+        <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3, width: '100%' }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Recent Hires
-            </Typography>
+            <Typography variant="h6" sx={{ mb: 2 }}>Recent Hires</Typography>
             <TableContainer>
               <Table>
                 <TableHead>
@@ -123,8 +120,8 @@ const Reports: React.FC = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {mockRecentHires.map((row) => (
-                    <TableRow key={row.name}>
+                  {recentHires.map((row: any) => (
+                    <TableRow key={row.name + row.startDate}>
                       <TableCell>{row.name}</TableCell>
                       <TableCell>{row.position}</TableCell>
                       <TableCell>{row.startDate}</TableCell>
@@ -134,25 +131,7 @@ const Reports: React.FC = () => {
               </Table>
             </TableContainer>
           </Paper>
-        </Box>
-      </Grid>
-
-      <Grid container spacing={3} sx={{ mt: 2 }}>
-        <Box sx={{ flexBasis: '100%', p: 1, display: 'flex' }}>
-          <Paper sx={{ p: 3, width: '100%' }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Key Metrics
-            </Typography>
-            <Grid container spacing={2}>
-              <Box sx={{ flexBasis: { xs: '100%', sm: '50%', md: '25%' }, p: 1, display: 'flex' }}>
-                <StatCard title="Average Time to Hire" value={mockHiringStats.averageTimeToHire} />
-              </Box>
-              <Box sx={{ flexBasis: { xs: '100%', sm: '50%', md: '25%' }, p: 1, display: 'flex' }}>
-                <StatCard title="Positions Open" value={mockHiringStats.positionsOpen} />
-              </Box>
-            </Grid>
-          </Paper>
-        </Box>
+        </Grid>
       </Grid>
     </Box>
   );

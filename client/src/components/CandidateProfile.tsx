@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -10,6 +10,8 @@ import {
   Chip,
   TextField,
   IconButton,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Dialog from '@mui/material/Dialog';
@@ -19,6 +21,9 @@ import CloseIcon from '@mui/icons-material/Close';
 // @ts-ignore
 import { Document, Page, pdfjs } from 'react-pdf';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+import axios from 'axios';
+
+const API_BASE = process.env.REACT_APP_API_URL || '';
 
 // Mock candidate data
 const mockCandidates = [
@@ -74,27 +79,132 @@ interface CandidateProfileProps {
 type Note = {
   id: number;
   text: string;
-  date: string;
+  date?: string;
   author?: string;
+  created_at?: string;
+  author_email?: string;
 };
+
+const statusOptions = [
+  'Interview Scheduled',
+  'Under Review',
+  'Hired',
+  'Rejected',
+];
 
 const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const candidate = mockCandidates.find(c => c.id === Number(id));
-  const [notes, setNotes] = useState<Note[]>(candidate ? [...candidate.notes] : []);
+  const [candidate, setCandidate] = useState<any>(null);
+  const [notes, setNotes] = useState<Note[]>([]);
   const [noteInput, setNoteInput] = useState('');
   const [resumeOpen, setResumeOpen] = useState(false);
   const [numPages, setNumPages] = useState<number | null>(null);
+  const [status, setStatus] = useState('');
+  const [resume, setResume] = useState('');
+  const [resumeId, setResumeId] = useState<number | null>(null);
+  const [resumeError, setResumeError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!candidate) return <Typography>Candidate not found.</Typography>;
+  useEffect(() => {
+    const fetchCandidate = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(`${API_BASE}/api/candidates/${id}`);
+        setCandidate(res.data);
+        setStatus(res.data.status);
+      } catch (err) {
+        setCandidate(null);
+      }
+      setLoading(false);
+    };
+    fetchCandidate();
+  }, [id]);
 
-  const handleAddNote = () => {
-    if (noteInput.trim()) {
-      setNotes([{ id: Date.now(), text: noteInput, date: new Date().toLocaleString(), author: user?.email }, ...notes]);
-      setNoteInput('');
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        const res = await axios.get(`${API_BASE}/api/notes/candidate/${id}`);
+        setNotes(res.data);
+      } catch (err) {
+        setNotes([]);
+      }
+    };
+    fetchNotes();
+  }, [id]);
+
+  useEffect(() => {
+    const fetchResume = async () => {
+      try {
+        const res = await axios.get(`${API_BASE}/api/resumes/candidate/${id}`, { withCredentials: true });
+        setResume(res.data.file_path); // Assuming file_path is the URL
+        setResumeId(res.data.id);
+      } catch (err) {
+        setResume('');
+        setResumeId(null);
+      }
+    };
+    fetchResume();
+  }, [id]);
+
+  const handleStatusChange = async (e: any) => {
+    const newStatus = e.target.value;
+    setStatus(newStatus);
+    if (candidate) {
+      try {
+        await axios.put(`${API_BASE}/api/candidates/${id}`, { ...candidate, status: newStatus });
+        setCandidate({ ...candidate, status: newStatus });
+      } catch (err) {
+        // Optionally show error
+      }
     }
   };
+
+  const handleAddNote = async () => {
+    if (noteInput.trim()) {
+      try {
+        const res = await axios.post(`${API_BASE}/api/notes`, { candidateId: id, text: noteInput }, { withCredentials: true });
+        setNotes([res.data, ...notes]);
+        setNoteInput('');
+      } catch (err) {
+        // Optionally show error
+      }
+    }
+  };
+
+  const handleDeleteResume = async () => {
+    if (resumeId) {
+      try {
+        await axios.delete(`${API_BASE}/api/resumes/${resumeId}`, { withCredentials: true });
+        setResume('');
+        setResumeId(null);
+      } catch (err) {
+        setResumeError('Failed to delete resume.');
+      }
+    }
+  };
+
+  const handleReplaceResume = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('resume', file);
+      try {
+        const res = await axios.post(`${API_BASE}/api/resumes/candidate/${id}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          withCredentials: true,
+        });
+        setResume(res.data.file_path);
+        setResumeId(res.data.id);
+        setResumeError(null);
+      } catch (err) {
+        setResumeError('Failed to upload resume.');
+      }
+    }
+  };
+
+  if (loading) return <Typography>Loading...</Typography>;
+  if (!candidate) return <Typography>Candidate not found.</Typography>;
 
   return (
     <Box sx={{ width: '100%', mt: 4, px: 3 }}>
@@ -109,7 +219,16 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
           <Box>
             <Typography variant="h5" sx={{ fontWeight: 700 }}>{candidate.name}</Typography>
             <Typography variant="subtitle1" color="text.secondary">{departments[candidate.department as 'technical' | 'financial' | 'customer']}</Typography>
-            <Chip label={candidate.status} color="primary" size="small" sx={{ mt: 1 }} />
+            <Select
+              value={status}
+              onChange={handleStatusChange}
+              size="small"
+              sx={{ mt: 1, minWidth: 180, bgcolor: '#E3EFFF', borderRadius: 2 }}
+            >
+              {statusOptions.map(option => (
+                <MenuItem key={option} value={option}>{option}</MenuItem>
+              ))}
+            </Select>
           </Box>
         </Box>
         <Divider sx={{ my: 2 }} />
@@ -126,11 +245,11 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
           </Box>
           <Box>
             <Typography variant="subtitle2" sx={{ color: '#E31837' }}>Resume</Typography>
-            {candidate.resume ? (
+            {resume ? (
               <Button
                 variant="outlined"
                 sx={{ borderColor: '#E31837', color: '#E31837', mt: 1 }}
-                onClick={() => setResumeOpen(true)}
+                onClick={() => { setResumeOpen(true); setResumeError(null); }}
               >
                 View Resume
               </Button>
@@ -158,7 +277,7 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
           {notes.map(note => (
             <Paper key={note.id} sx={{ p: 2, mb: 2, background: '#fff7f7', borderLeft: '4px solid #E31837' }}>
               <Typography variant="body2" sx={{ fontWeight: 500 }}>{note.text}</Typography>
-              <Typography variant="caption" color="text.secondary">{note.date} — {note.author || 'Unknown'}</Typography>
+              <Typography variant="caption" color="text.secondary">{note?.created_at || note?.date} — {note?.author_email || note?.author || 'Unknown'}</Typography>
             </Paper>
           ))}
         </Box>
@@ -169,16 +288,33 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
           <IconButton onClick={() => setResumeOpen(false)}><CloseIcon /></IconButton>
         </DialogTitle>
         <DialogContent dividers sx={{ height: 600, overflow: 'auto', background: '#f5f5f5' }}>
-          <Document
-            file={candidate.resume}
-            onLoadSuccess={({ numPages }: { numPages: number }) => setNumPages(numPages)}
-            loading={<Typography>Loading PDF...</Typography>}
-            error={<Typography color="error">Failed to load PDF.</Typography>}
-          >
-            {Array.from(new Array(numPages), (el, index) => (
-              <Page key={`page_${index + 1}`} pageNumber={index + 1} width={700} />
-            ))}
-          </Document>
+          {resume ? (
+            <Document
+              file={resume}
+              onLoadSuccess={({ numPages }: { numPages: number }) => { setNumPages(numPages); setResumeError(null); }}
+              loading={<Typography>Loading PDF...</Typography>}
+              error={<Typography color="error">Failed to load PDF.</Typography>}
+            >
+              {Array.from(new Array(numPages), (el, index) => (
+                <Page key={`page_${index + 1}`} pageNumber={index + 1} width={700} />
+              ))}
+            </Document>
+          ) : (
+            <Typography color="error">No resume uploaded.</Typography>
+          )}
+          <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+            <Button color="error" variant="outlined" onClick={handleDeleteResume}>Delete Resume</Button>
+            <Button variant="outlined" component="label">
+              Replace Resume
+              <input
+                type="file"
+                accept="application/pdf"
+                hidden
+                onChange={handleReplaceResume}
+              />
+            </Button>
+          </Box>
+          {resumeError && <Typography color="error" sx={{ mt: 1 }}>{resumeError}</Typography>}
         </DialogContent>
       </Dialog>
     </Box>

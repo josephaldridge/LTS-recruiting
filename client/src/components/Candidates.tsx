@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -34,36 +34,14 @@ import { useNavigate } from 'react-router-dom';
 // @ts-ignore
 import * as pdfjsLib from 'pdfjs-dist';
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+import axios from 'axios';
 
-// Mock data - would come from API
+const API_BASE = process.env.REACT_APP_API_URL || '';
+
 const departments = [
   { label: 'Technical Support', value: 'technical', display: 'Tier 1 Technical Support Representative' },
   { label: 'Financial Products Support', value: 'financial', display: 'Financial Product Support Representative' },
   { label: 'Customer Care Center', value: 'customer', display: 'Customer Service Agent' },
-];
-
-const mockCandidates = [
-  {
-    id: 1,
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '(555) 123-4567',
-    status: 'Interview Scheduled',
-    position: 'Tax Preparer',
-    appliedDate: '2024-01-15',
-    department: 'technical',
-  },
-  {
-    id: 2,
-    name: 'Jane Smith',
-    email: 'jane.smith@example.com',
-    phone: '(555) 234-5678',
-    status: 'Under Review',
-    position: 'Tax Preparer',
-    appliedDate: '2024-01-16',
-    department: 'financial',
-  },
-  // Add more mock data as needed
 ];
 
 const statusColors = {
@@ -104,6 +82,9 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [candidates, setCandidates] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
   const [newCandidate, setNewCandidate] = useState({
@@ -117,6 +98,20 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
     resume: null as File | null,
   });
 
+  useEffect(() => {
+    const fetchCandidates = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(`${API_BASE}/api/candidates`);
+        setCandidates(res.data);
+      } catch (err) {
+        setCandidates([]);
+      }
+      setLoading(false);
+    };
+    fetchCandidates();
+  }, []);
+
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -126,27 +121,27 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
     setPage(0);
   };
 
-  const filteredCandidates = mockCandidates.filter((candidate) =>
+  const filteredCandidates = candidates.filter((candidate) =>
     (selectedDepartment === '' || candidate.department === selectedDepartment) &&
+    (selectedStatus === '' || candidate.status === selectedStatus) &&
     Object.values(candidate).some((value) =>
-      value.toString().toLowerCase().includes(searchQuery.toLowerCase())
+      value?.toString().toLowerCase().includes(searchQuery.toLowerCase())
     )
   );
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-        <Typography variant="h4">Candidates</Typography>
+      <Box sx={{ display: 'flex', flexDirection: 'column', mb: 3 }}>
+        <Typography variant="h4" sx={{ mb: 2 }}>Candidates</Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          sx={{ backgroundColor: '#E31837', '&:hover': { backgroundColor: '#b00000' } }}
+          sx={{ backgroundColor: '#E31837', width: 'fit-content', mb: 2, '&:hover': { backgroundColor: '#b00000' } }}
           onClick={() => setOpenDialog(true)}
         >
           Add Candidate
         </Button>
       </Box>
-
       <Box sx={{ mb: 2, display: 'flex', gap: 2 }}>
         <TextField
           select
@@ -160,8 +155,19 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
             <MenuItem key={dept.value} value={dept.value}>{dept.label}</MenuItem>
           ))}
         </TextField>
+        <TextField
+          select
+          label="Filter by Status"
+          value={selectedStatus}
+          onChange={(e) => setSelectedStatus(e.target.value)}
+          sx={{ width: 250 }}
+        >
+          <MenuItem value="">All Statuses</MenuItem>
+          {Object.keys(statusColors).map((status) => (
+            <MenuItem key={status} value={status}>{status}</MenuItem>
+          ))}
+        </TextField>
       </Box>
-
       <Paper sx={{ mb: 3, p: 2 }}>
         <TextField
           fullWidth
@@ -178,7 +184,6 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
           }}
         />
       </Paper>
-
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -212,7 +217,7 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
                       size="small"
                     />
                   </TableCell>
-                  <TableCell>{candidate.appliedDate}</TableCell>
+                  <TableCell>{candidate.applied_date || candidate.appliedDate}</TableCell>
                   <TableCell>
                     <Box>
                       <Typography variant="body2">{candidate.email}</Typography>

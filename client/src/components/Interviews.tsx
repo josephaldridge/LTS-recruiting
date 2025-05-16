@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -31,30 +31,9 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 import dayjs from 'dayjs';
+import axios from 'axios';
 
-// Mock data - would come from API
-const mockInterviews = [
-  {
-    id: 1,
-    candidateName: 'John Doe',
-    position: 'Tax Preparer',
-    interviewer: 'Sarah Johnson',
-    date: '2024-02-01',
-    time: '10:00 AM',
-    status: 'Scheduled',
-    type: 'In-Person',
-  },
-  {
-    id: 2,
-    candidateName: 'Jane Smith',
-    position: 'Tax Preparer',
-    interviewer: 'Mike Wilson',
-    date: '2024-02-02',
-    time: '2:30 PM',
-    status: 'Completed',
-    type: 'Virtual',
-  },
-];
+const API_BASE = process.env.REACT_APP_API_URL || '';
 
 const statusColors = {
   'Scheduled': 'primary',
@@ -68,6 +47,22 @@ const Interviews: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
+  const [interviews, setInterviews] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchInterviews = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(`${API_BASE}/api/interviews`);
+        setInterviews(res.data);
+      } catch (err) {
+        setInterviews([]);
+      }
+      setLoading(false);
+    };
+    fetchInterviews();
+  }, []);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -78,17 +73,17 @@ const Interviews: React.FC = () => {
     setPage(0);
   };
 
-  const filteredInterviews = mockInterviews.filter((interview) =>
-    Object.values(interview).some((value) =>
-      value.toString().toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredInterviews = interviews.filter((interview: any) =>
+    Object.values(interview).some((value: any) =>
+      value?.toString().toLowerCase().includes(searchQuery.toLowerCase())
     )
   );
 
   const today = dayjs().format('YYYY-MM-DD');
   const now = dayjs();
-  const pastInterviews = mockInterviews.filter(i => dayjs(i.date).isBefore(today));
-  const todayInterviews = mockInterviews.filter(i => i.date === today);
-  const upcomingInterviews = mockInterviews.filter(i => dayjs(i.date).isAfter(today));
+  const pastInterviews = filteredInterviews.filter((i: any) => dayjs(i.date).isBefore(today));
+  const todayInterviews = filteredInterviews.filter((i: any) => i.date === today);
+  const upcomingInterviews = filteredInterviews.filter((i: any) => dayjs(i.date).isAfter(today));
 
   return (
     <Box>

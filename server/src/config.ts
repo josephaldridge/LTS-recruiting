@@ -9,11 +9,11 @@ export const config = {
     
     // Database
     db: {
-        host: process.env.DB_HOST || 'localhost',
+        host: process.env.DB_HOST,
         port: parseInt(process.env.DB_PORT || '5432'),
-        database: process.env.DB_NAME || 'liberty_tax_hiring',
-        user: process.env.DB_USER || 'postgres',
-        password: 'L1b3rty$',
+        database: process.env.DB_NAME,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
     },
     
     // Firebase Auth

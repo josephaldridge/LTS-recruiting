@@ -1,20 +1,13 @@
 import * as admin from 'firebase-admin';
-import path from 'path';
 
-// Initialize Firebase Admin
-const serviceAccountPath = path.join(__dirname, 'firebase-service-account.json');
-
-try {
-    const serviceAccount = require(serviceAccountPath);
-    
-    if (!admin.apps.length) {
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount)
-        });
-    }
-} catch (error) {
-    console.error('Error initializing Firebase Admin:', error);
-    throw new Error('Failed to initialize Firebase Admin. Make sure you have the service account JSON file.');
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    }),
+  });
 }
 
 export default admin; 

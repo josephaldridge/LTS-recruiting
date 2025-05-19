@@ -88,6 +88,9 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [candidateToDelete, setCandidateToDelete] = useState<number | null>(null);
   const [newCandidate, setNewCandidate] = useState({
     name: '',
     email: '',
@@ -147,6 +150,26 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
     } catch (err) {
       // Optionally handle error
       alert('Failed to add candidate.');
+    }
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent, candidateId: number) => {
+    e.stopPropagation();
+    setCandidateToDelete(candidateId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deleteConfirmText.toLowerCase() === 'delete' && candidateToDelete) {
+      try {
+        await axiosInstance.delete(`/api/candidates/${candidateToDelete}`);
+        setCandidates(prev => prev.filter(c => c.id !== candidateToDelete));
+        setDeleteDialogOpen(false);
+        setDeleteConfirmText('');
+        setCandidateToDelete(null);
+      } catch (err) {
+        alert('Failed to delete candidate.');
+      }
     }
   };
 
@@ -246,10 +269,11 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
                     </Box>
                   </TableCell>
                   <TableCell>
-                    <IconButton size="small" color="primary" onClick={e => { e.stopPropagation(); /* edit logic */ }}>
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton size="small" color="error" onClick={e => { e.stopPropagation(); /* delete logic */ }}>
+                    <IconButton 
+                      size="small" 
+                      color="error" 
+                      onClick={(e) => handleDeleteClick(e, candidate.id)}
+                    >
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>
@@ -306,6 +330,39 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
           <Button variant="contained" sx={{ bgcolor: '#E31837' }} onClick={handleAddCandidate}>Add</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>Delete Candidate</DialogTitle>
+        <DialogContent>
+          <Typography sx={{ mb: 2 }}>
+            This action cannot be undone. Please type "delete" to confirm.
+          </Typography>
+          <TextField
+            fullWidth
+            value={deleteConfirmText}
+            onChange={(e) => setDeleteConfirmText(e.target.value)}
+            placeholder="Type 'delete' to confirm"
+            error={deleteConfirmText !== '' && deleteConfirmText.toLowerCase() !== 'delete'}
+            helperText={deleteConfirmText !== '' && deleteConfirmText.toLowerCase() !== 'delete' ? 'Please type "delete" exactly' : ''}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {
+            setDeleteDialogOpen(false);
+            setDeleteConfirmText('');
+            setCandidateToDelete(null);
+          }}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleDeleteConfirm}
+            color="error"
+            disabled={deleteConfirmText.toLowerCase() !== 'delete'}
+          >
+            Delete
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

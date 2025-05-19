@@ -10,7 +10,11 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['https://lts-recruiting-6etcyb4sa-josephaldridges-projects.vercel.app', 'http://localhost:3000'],
+  origin: [
+    'https://lts-recruiting-6etcyb4sa-josephaldridges-projects.vercel.app',
+    'https://lts-recruiting.vercel.app',
+    'http://localhost:3000'
+  ],
   credentials: true
 }));
 app.use(express.json());

@@ -23,6 +23,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  SelectChangeEvent,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -49,6 +50,15 @@ const Interviews: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [interviews, setInterviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [candidates, setCandidates] = useState<any[]>([]);
+  const [interviewers, setInterviewers] = useState<any[]>([]);
+  const [formData, setFormData] = useState({
+    candidateId: '',
+    interviewerId: '',
+    date: '',
+    time: '',
+    type: ''
+  });
 
   useEffect(() => {
     const fetchInterviews = async () => {
@@ -62,6 +72,30 @@ const Interviews: React.FC = () => {
       setLoading(false);
     };
     fetchInterviews();
+  }, []);
+
+  useEffect(() => {
+    const fetchCandidates = async () => {
+      try {
+        const res = await axios.get(`${API_BASE}/api/candidates`);
+        setCandidates(res.data);
+      } catch (err) {
+        setCandidates([]);
+      }
+    };
+    fetchCandidates();
+  }, []);
+
+  useEffect(() => {
+    const fetchInterviewers = async () => {
+      try {
+        const res = await axios.get(`${API_BASE}/api/interviewers`);
+        setInterviewers(res.data);
+      } catch (err) {
+        setInterviewers([]);
+      }
+    };
+    fetchInterviewers();
   }, []);
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -85,6 +119,49 @@ const Interviews: React.FC = () => {
   const todayInterviews = filteredInterviews.filter((i: any) => i.date === today);
   const upcomingInterviews = filteredInterviews.filter((i: any) => dayjs(i.date).isAfter(today));
 
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSelectChange = (event: SelectChangeEvent<string>) => {
+    const { name, value } = event.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSelectFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      await axios.post(`${API_BASE}/api/interviews`, formData);
+      // Refresh interviews list
+      const res = await axios.get(`${API_BASE}/api/interviews`);
+      setInterviews(res.data);
+      setOpenDialog(false);
+      setFormData({
+        candidateId: '',
+        interviewerId: '',
+        date: '',
+        time: '',
+        type: ''
+      });
+    } catch (err) {
+      console.error('Failed to schedule interview:', err);
+    }
+  };
+
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
@@ -93,7 +170,12 @@ const Interviews: React.FC = () => {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => setOpenDialog(true)}
-          sx={{ backgroundColor: 'primary.main' }}
+          sx={{ 
+            backgroundColor: 'primary.main',
+            position: 'relative',
+            zIndex: 1,
+            marginLeft: 'auto'
+          }}
         >
           Schedule Interview
         </Button>
@@ -198,35 +280,54 @@ const Interviews: React.FC = () => {
               label="Candidate"
               fullWidth
               select
-              defaultValue=""
+              name="candidateId"
+              value={formData.candidateId}
+              onChange={handleSelectFieldChange}
             >
-              <MenuItem value="1">John Doe</MenuItem>
-              <MenuItem value="2">Jane Smith</MenuItem>
+              {candidates.map((c: any) => (
+                <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>
+              ))}
             </TextField>
             <TextField
               label="Interviewer"
               fullWidth
               select
-              defaultValue=""
+              name="interviewerId"
+              value={formData.interviewerId}
+              onChange={handleSelectFieldChange}
             >
-              <MenuItem value="1">Sarah Johnson</MenuItem>
-              <MenuItem value="2">Mike Wilson</MenuItem>
+              {interviewers.map((interviewer: any) => (
+                <MenuItem key={interviewer.id} value={interviewer.id}>
+                  {interviewer.name}
+                </MenuItem>
+              ))}
             </TextField>
             <TextField
               label="Date"
               type="date"
               fullWidth
+              name="date"
+              value={formData.date}
+              onChange={handleInputChange}
               InputLabelProps={{ shrink: true }}
             />
             <TextField
               label="Time"
               type="time"
               fullWidth
+              name="time"
+              value={formData.time}
+              onChange={handleInputChange}
               InputLabelProps={{ shrink: true }}
             />
             <FormControl fullWidth>
               <InputLabel>Interview Type</InputLabel>
-              <Select label="Interview Type" defaultValue="">
+              <Select 
+                label="Interview Type" 
+                name="type"
+                value={formData.type}
+                onChange={handleSelectChange}
+              >
                 <MenuItem value="in-person">In-Person</MenuItem>
                 <MenuItem value="virtual">Virtual</MenuItem>
                 <MenuItem value="phone">Phone</MenuItem>
@@ -236,7 +337,7 @@ const Interviews: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button variant="contained" onClick={() => setOpenDialog(false)}>
+          <Button variant="contained" onClick={handleSubmit}>
             Schedule
           </Button>
         </DialogActions>

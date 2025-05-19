@@ -129,6 +129,26 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
     )
   );
 
+  const handleAddCandidate = async () => {
+    try {
+      let formData = new FormData();
+      Object.entries(newCandidate).forEach(([key, value]) => {
+        if (value) formData.append(key, value as any);
+      });
+      const res = await axios.post(`${API_BASE}/api/candidates`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setCandidates(prev => [res.data, ...prev]);
+      setOpenDialog(false);
+      setNewCandidate({
+        name: '', email: '', phone: '', department: '', position: '', city: '', state: '', resume: null,
+      });
+    } catch (err) {
+      // Optionally handle error
+      alert('Failed to add candidate.');
+    }
+  };
+
   return (
     <Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', mb: 3 }}>
@@ -284,7 +304,7 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button variant="contained" sx={{ bgcolor: '#E31837' }} onClick={() => setOpenDialog(false)}>Add</Button>
+          <Button variant="contained" sx={{ bgcolor: '#E31837' }} onClick={handleAddCandidate}>Add</Button>
         </DialogActions>
       </Dialog>
     </Box>

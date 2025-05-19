@@ -20,7 +20,6 @@ const API_BASE = process.env.REACT_APP_API_URL || '';
 
 const Reports: React.FC = () => {
   const [stats, setStats] = useState<any>({});
-  const [topPositions, setTopPositions] = useState<any[]>([]);
   const [recentHires, setRecentHires] = useState<any[]>([]);
   const navigate = useNavigate();
 
@@ -29,18 +28,20 @@ const Reports: React.FC = () => {
       try {
         const statsRes = await axios.get(`${API_BASE}/api/reports/stats`);
         setStats(statsRes.data);
-        const topRes = await axios.get(`${API_BASE}/api/reports/top-positions`);
-        setTopPositions(topRes.data);
         const hiresRes = await axios.get(`${API_BASE}/api/reports/recent-hires`);
         setRecentHires(hiresRes.data);
       } catch (err) {
         setStats({});
-        setTopPositions([]);
         setRecentHires([]);
       }
     };
     fetchData();
   }, []);
+
+  const handleCardClick = (path: string, filters?: Record<string, string>) => {
+    const searchParams = new URLSearchParams(filters);
+    navigate(`${path}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`);
+  };
 
   return (
     <Box>
@@ -49,7 +50,10 @@ const Reports: React.FC = () => {
       </Typography>
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ cursor: 'pointer' }} onClick={() => navigate('/candidates')}>
+          <Card 
+            sx={{ cursor: 'pointer' }} 
+            onClick={() => handleCardClick('/candidates', { view: 'all' })}
+          >
             <CardContent>
               <Typography color="text.secondary" gutterBottom>Total Candidates</Typography>
               <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>{stats.totalApplications ?? '-'}</Typography>
@@ -57,7 +61,10 @@ const Reports: React.FC = () => {
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ cursor: 'pointer' }} onClick={() => navigate('/interviews')}>
+          <Card 
+            sx={{ cursor: 'pointer' }} 
+            onClick={() => handleCardClick('/interviews', { view: 'upcoming' })}
+          >
             <CardContent>
               <Typography color="text.secondary" gutterBottom>Interviews Scheduled</Typography>
               <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>{stats.interviewsConducted ?? '-'}</Typography>
@@ -65,7 +72,10 @@ const Reports: React.FC = () => {
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ cursor: 'pointer' }} onClick={() => navigate('/candidates?status=Hired')}>
+          <Card 
+            sx={{ cursor: 'pointer' }} 
+            onClick={() => handleCardClick('/candidates', { status: 'Hired' })}
+          >
             <CardContent>
               <Typography color="text.secondary" gutterBottom>Hired</Typography>
               <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>{stats.hiresCompleted ?? '-'}</Typography>
@@ -73,7 +83,10 @@ const Reports: React.FC = () => {
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ cursor: 'pointer' }} onClick={() => navigate('/candidates?status=Pending Review')}>
+          <Card 
+            sx={{ cursor: 'pointer' }} 
+            onClick={() => handleCardClick('/candidates', { status: 'Pending Review' })}
+          >
             <CardContent>
               <Typography color="text.secondary" gutterBottom>Pending Review</Typography>
               <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>{stats.pendingReview ?? '-'}</Typography>
@@ -82,32 +95,7 @@ const Reports: React.FC = () => {
         </Grid>
       </Grid>
       <Grid container spacing={3} sx={{ mt: 2 }}>
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3, width: '100%' }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>Top Positions</Typography>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Position</TableCell>
-                    <TableCell align="right">Applications</TableCell>
-                    <TableCell align="right">Hired</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {topPositions.map((row: any) => (
-                    <TableRow key={row.position}>
-                      <TableCell>{row.position}</TableCell>
-                      <TableCell align="right">{row.applications}</TableCell>
-                      <TableCell align="right">{row.hired}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12}>
           <Paper sx={{ p: 3, width: '100%' }}>
             <Typography variant="h6" sx={{ mb: 2 }}>Recent Hires</Typography>
             <TableContainer>
@@ -121,7 +109,11 @@ const Reports: React.FC = () => {
                 </TableHead>
                 <TableBody>
                   {recentHires.map((row: any) => (
-                    <TableRow key={row.name + row.startDate}>
+                    <TableRow 
+                      key={row.name + row.startDate}
+                      sx={{ cursor: 'pointer' }}
+                      onClick={() => handleCardClick('/candidates', { id: row.id })}
+                    >
                       <TableCell>{row.name}</TableCell>
                       <TableCell>{row.position}</TableCell>
                       <TableCell>{row.startDate}</TableCell>

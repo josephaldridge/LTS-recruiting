@@ -233,174 +233,179 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
   if (!candidate) return <Typography>Candidate not found.</Typography>;
 
   return (
-    <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4 }}>
-      <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} sx={{ mb: 2 }}>
-        Back
-      </Button>
-      <Paper sx={{ p: 4 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <Avatar sx={{ width: 64, height: 64, mr: 2 }}>
-            {candidate?.name?.[0]}
-          </Avatar>
-          <Box>
-            {editMode ? (
-              <TextField
-                label="Name"
-                value={editCandidate?.name || ''}
-                onChange={e => handleEditChange('name', e.target.value)}
-                sx={{ mb: 1 }}
-              />
-            ) : (
-              <Typography variant="h5">{candidate?.name}</Typography>
-            )}
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', minHeight: '80vh', mt: 4 }}>
+      <Box sx={{ width: 500 }}>
+        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} sx={{ mb: 2 }}>
+          Back
+        </Button>
+        <Paper sx={{ p: 4, borderRadius: 3, boxShadow: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Avatar sx={{ width: 64, height: 64, mr: 2 }}>
+              {candidate?.name?.[0]}
+            </Avatar>
+            <Box>
               {editMode ? (
                 <TextField
-                  label="Email"
-                  value={editCandidate?.email || ''}
-                  onChange={e => handleEditChange('email', e.target.value)}
-                  size="small"
-                  sx={{ mr: 1 }}
+                  label="Name"
+                  value={editCandidate?.name || ''}
+                  onChange={e => handleEditChange('name', e.target.value)}
+                  sx={{ mb: 1 }}
                 />
               ) : (
-                <Chip label={candidate?.email} />
+                <Typography variant="h5">{candidate?.name || 'N/A'}</Typography>
               )}
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                {editMode ? (
+                  <TextField
+                    label="Email"
+                    value={editCandidate?.email || ''}
+                    onChange={e => handleEditChange('email', e.target.value)}
+                    size="small"
+                    sx={{ mr: 1 }}
+                  />
+                ) : (
+                  <Chip label={candidate?.email || 'N/A'} />
+                )}
+                {editMode ? (
+                  <TextField
+                    label="Phone"
+                    value={editCandidate?.phone || ''}
+                    onChange={e => handleEditChange('phone', e.target.value)}
+                    size="small"
+                  />
+                ) : (
+                  <Chip label={candidate?.phone || 'N/A'} />
+                )}
+              </Box>
+            </Box>
+          </Box>
+          <Divider sx={{ my: 2 }} />
+          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mb: 2 }}>
+            <Box>
+              <Typography variant="subtitle2">Status</Typography>
+              {editMode ? (
+                <Select
+                  value={editCandidate?.status || ''}
+                  onChange={e => handleEditChange('status', e.target.value)}
+                  size="small"
+                  fullWidth
+                >
+                  {statusOptions.map(opt => (
+                    <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                  ))}
+                </Select>
+              ) : (
+                <Typography>{candidate?.status || 'N/A'}</Typography>
+              )}
+            </Box>
+            <Box>
+              <Typography variant="subtitle2">Position</Typography>
               {editMode ? (
                 <TextField
-                  label="Phone"
-                  value={editCandidate?.phone || ''}
-                  onChange={e => handleEditChange('phone', e.target.value)}
+                  value={editCandidate?.position || ''}
+                  onChange={e => handleEditChange('position', e.target.value)}
                   size="small"
+                  fullWidth
                 />
               ) : (
-                <Chip label={candidate?.phone} />
+                <Typography>{candidate?.position || 'N/A'}</Typography>
+              )}
+            </Box>
+            <Box>
+              <Typography variant="subtitle2">Department</Typography>
+              {editMode ? (
+                <Select
+                  value={editCandidate?.department || ''}
+                  onChange={e => handleEditChange('department', e.target.value)}
+                  size="small"
+                  fullWidth
+                >
+                  {Object.entries(departments).map(([val, label]) => (
+                    <MenuItem key={val} value={val}>{label}</MenuItem>
+                  ))}
+                </Select>
+              ) : (
+                <Typography>{candidate?.department && departments.hasOwnProperty(candidate.department) ? departments[candidate.department as keyof typeof departments] : candidate?.department || 'N/A'}</Typography>
+              )}
+            </Box>
+            <Box>
+              <Typography variant="subtitle2">Location</Typography>
+              {editMode ? (
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <TextField
+                    label="City"
+                    value={editCandidate?.demographics?.city || ''}
+                    onChange={e => handleEditDemographics('city', e.target.value)}
+                    size="small"
+                  />
+                  <TextField
+                    label="State"
+                    value={editCandidate?.demographics?.state || ''}
+                    onChange={e => handleEditDemographics('state', e.target.value)}
+                    size="small"
+                  />
+                </Box>
+              ) : (
+                <Typography>{(candidate?.demographics?.city || 'N/A') + ', ' + (candidate?.demographics?.state || 'N/A')}</Typography>
               )}
             </Box>
           </Box>
-        </Box>
-        <Divider sx={{ my: 2 }} />
-        <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', mb: 2 }}>
-          <Box>
-            <Typography variant="subtitle2">Status</Typography>
-            {editMode ? (
-              <Select
-                value={editCandidate?.status || ''}
-                onChange={e => handleEditChange('status', e.target.value)}
-                size="small"
-              >
-                {statusOptions.map(opt => (
-                  <MenuItem key={opt} value={opt}>{opt}</MenuItem>
-                ))}
-              </Select>
-            ) : (
-              <Typography>{candidate?.status}</Typography>
-            )}
-          </Box>
-          <Box>
-            <Typography variant="subtitle2">Position</Typography>
-            {editMode ? (
-              <TextField
-                value={editCandidate?.position || ''}
-                onChange={e => handleEditChange('position', e.target.value)}
-                size="small"
-              />
-            ) : (
-              <Typography>{candidate?.position}</Typography>
-            )}
-          </Box>
-          <Box>
-            <Typography variant="subtitle2">Department</Typography>
-            {editMode ? (
-              <Select
-                value={editCandidate?.department || ''}
-                onChange={e => handleEditChange('department', e.target.value)}
-                size="small"
-              >
-                {Object.entries(departments).map(([val, label]) => (
-                  <MenuItem key={val} value={val}>{label}</MenuItem>
-                ))}
-              </Select>
-            ) : (
-              <Typography>{candidate?.department && departments.hasOwnProperty(candidate.department) ? departments[candidate.department as keyof typeof departments] : candidate?.department || 'N/A'}</Typography>
-            )}
-          </Box>
-          <Box>
-            <Typography variant="subtitle2">Location</Typography>
-            {editMode ? (
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                <TextField
-                  label="City"
-                  value={editCandidate?.demographics?.city || ''}
-                  onChange={e => handleEditDemographics('city', e.target.value)}
-                  size="small"
-                />
-                <TextField
-                  label="State"
-                  value={editCandidate?.demographics?.state || ''}
-                  onChange={e => handleEditDemographics('state', e.target.value)}
-                  size="small"
-                />
+          <Divider sx={{ my: 2 }} />
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="subtitle2">Resume</Typography>
+            {resume ? (
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                <Button variant="outlined" onClick={() => window.open(resume, '_blank')}>View Resume</Button>
+                <Button variant="outlined" component="label">
+                  Upload Resume
+                  <input type="file" hidden onChange={handleReplaceResume} />
+                </Button>
+                <Button color="error" onClick={handleDeleteResume}>Delete Resume</Button>
               </Box>
             ) : (
-              <Typography>{candidate?.demographics?.city}, {candidate?.demographics?.state}</Typography>
-            )}
-          </Box>
-        </Box>
-        <Divider sx={{ my: 2 }} />
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="subtitle2">Resume</Typography>
-          {resume ? (
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-              <Button variant="outlined" onClick={() => window.open(resume, '_blank')}>View Resume</Button>
               <Button variant="outlined" component="label">
                 Upload Resume
                 <input type="file" hidden onChange={handleReplaceResume} />
               </Button>
-              <Button color="error" onClick={handleDeleteResume}>Delete Resume</Button>
+            )}
+            {resumeError && <Typography color="error">{resumeError}</Typography>}
+          </Box>
+          <Divider sx={{ my: 2 }} />
+          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+            {!editMode ? (
+              <Button variant="contained" onClick={() => setEditMode(true)}>Edit</Button>
+            ) : (
+              <Button variant="contained" color="success" onClick={handleSave}>Save</Button>
+            )}
+            {editMode && (
+              <Button variant="outlined" color="inherit" onClick={() => { setEditMode(false); setEditCandidate(candidate); }}>Cancel</Button>
+            )}
+          </Box>
+          <Paper sx={{ p: 3, borderLeft: '6px solid #E31837', maxHeight: 350, overflow: 'auto', background: '#fafbfc' }}>
+            <Typography variant="h6" sx={{ color: '#E31837', mb: 2 }}>Notes</Typography>
+            <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="Add a note..."
+                value={noteInput}
+                onChange={e => setNoteInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleAddNote(); }}
+              />
+              <Button variant="contained" sx={{ bgcolor: '#E31837' }} onClick={handleAddNote}>Add</Button>
             </Box>
-          ) : (
-            <Button variant="outlined" component="label">
-              Upload Resume
-              <input type="file" hidden onChange={handleReplaceResume} />
-            </Button>
-          )}
-          {resumeError && <Typography color="error">{resumeError}</Typography>}
-        </Box>
-        <Divider sx={{ my: 2 }} />
-        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-          {!editMode ? (
-            <Button variant="contained" onClick={() => setEditMode(true)}>Edit</Button>
-          ) : (
-            <Button variant="contained" color="success" onClick={handleSave}>Save</Button>
-          )}
-          {editMode && (
-            <Button variant="outlined" color="inherit" onClick={() => { setEditMode(false); setEditCandidate(candidate); }}>Cancel</Button>
-          )}
-        </Box>
-        <Paper sx={{ p: 3, borderLeft: '6px solid #E31837', maxHeight: 350, overflow: 'auto' }}>
-          <Typography variant="h6" sx={{ color: '#E31837', mb: 2 }}>Notes</Typography>
-          <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-            <TextField
-              fullWidth
-              size="small"
-              placeholder="Add a note..."
-              value={noteInput}
-              onChange={e => setNoteInput(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') handleAddNote(); }}
-            />
-            <Button variant="contained" sx={{ bgcolor: '#E31837' }} onClick={handleAddNote}>Add</Button>
-          </Box>
-          <Box sx={{ maxHeight: 220, overflowY: 'auto', pr: 1 }}>
-            {notes.length === 0 && <Typography color="text.secondary">No notes yet.</Typography>}
-            {notes.map(note => (
-              <Paper key={note.id} sx={{ p: 2, mb: 2, background: '#fff7f7', borderLeft: '4px solid #E31837' }}>
-                <Typography variant="body2" sx={{ fontWeight: 500 }}>{note.text}</Typography>
-                <Typography variant="caption" color="text.secondary">{note?.created_at || note?.date} — {note?.author_email || note?.author || 'Unknown'}</Typography>
-              </Paper>
-            ))}
-          </Box>
+            <Box sx={{ maxHeight: 220, overflowY: 'auto', pr: 1 }}>
+              {notes.length === 0 && <Typography color="text.secondary">No notes yet.</Typography>}
+              {notes.map(note => (
+                <Paper key={note.id} sx={{ p: 2, mb: 2, background: '#fff7f7', borderLeft: '4px solid #E31837' }}>
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>{note.text}</Typography>
+                  <Typography variant="caption" color="text.secondary">{note?.created_at || note?.date} — {note?.author_email || note?.author || 'Unknown'}</Typography>
+                </Paper>
+              ))}
+            </Box>
+          </Paper>
         </Paper>
-      </Paper>
+      </Box>
     </Box>
   );
 };

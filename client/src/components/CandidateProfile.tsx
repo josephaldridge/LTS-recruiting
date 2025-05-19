@@ -229,12 +229,22 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
     }
   };
 
+  // Helper for location display
+  const getLocation = () => {
+    const city = candidate?.demographics?.city;
+    const state = candidate?.demographics?.state;
+    if (!city && !state) return 'N/A';
+    if (!city) return `N/A, ${state}`;
+    if (!state) return `${city}, N/A`;
+    return `${city}, ${state}`;
+  };
+
   if (loading) return <Typography>Loading...</Typography>;
   if (!candidate) return <Typography>Candidate not found.</Typography>;
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', minHeight: '80vh', mt: 4 }}>
-      <Box sx={{ width: 500 }}>
+      <Box sx={{ width: 650, maxWidth: '95vw' }}>
         <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} sx={{ mb: 2 }}>
           Back
         </Button>
@@ -280,7 +290,7 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
             </Box>
           </Box>
           <Divider sx={{ my: 2 }} />
-          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mb: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2 }}>
             <Box>
               <Typography variant="subtitle2">Status</Typography>
               {editMode ? (
@@ -346,7 +356,7 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
                   />
                 </Box>
               ) : (
-                <Typography>{(candidate?.demographics?.city || 'N/A') + ', ' + (candidate?.demographics?.state || 'N/A')}</Typography>
+                <Typography>{getLocation()}</Typography>
               )}
             </Box>
           </Box>

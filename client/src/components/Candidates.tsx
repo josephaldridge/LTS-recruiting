@@ -46,10 +46,11 @@ const departments = [
 ];
 
 const statusColors = {
+  'Needs Interview': 'warning',
   'Interview Scheduled': 'primary',
-  'Under Review': 'warning',
+  'Under Review': 'info',
+  'Submitted': 'secondary',
   'Hired': 'success',
-  'Rejected': 'error',
 } as const;
 
 const extractFieldsFromResume = async (file: File) => {

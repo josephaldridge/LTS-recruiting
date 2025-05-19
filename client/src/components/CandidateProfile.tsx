@@ -87,10 +87,11 @@ type Note = {
 };
 
 const statusOptions = [
+  'Needs Interview',
   'Interview Scheduled',
   'Under Review',
+  'Submitted',
   'Hired',
-  'Rejected',
 ];
 
 const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {

@@ -3,12 +3,12 @@ import { getAuth } from 'firebase/auth';
 
 // Firebase configuration for LTS Recruiting
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.REACT_APP_FIREBASE_APP_ID
+  apiKey: "AIzaSyDVe5b7W4qgy4SaDptwU6vlHYFKpFbyg98",
+  authDomain: "lts-recruiting.firebaseapp.com",
+  projectId: "lts-recruiting",
+  storageBucket: "lts-recruiting.firebasestorage.app",
+  messagingSenderId: "597216224022",
+  appId: "1:597216224022:web:4edd9beb583071abed2637"
 };
 
 // Initialize Firebase

@@ -158,38 +158,6 @@ const Dashboard: React.FC = () => {
     statuses: statusCounts
   };
 
-  // Stats
-  const stats = [
-    {
-      title: 'Total Candidates',
-      value: candidates.length,
-      icon: <PeopleIcon sx={{ color: 'primary.main' }} />,
-      color: '#E31837',
-      onClick: () => setModal('candidates'),
-    },
-    {
-      title: 'Interviews Scheduled',
-      value: upcomingInterviews.length,
-      icon: <EventNoteIcon sx={{ color: 'secondary.main' }} />,
-      color: '#002D72',
-      onClick: () => setModal('interviews'),
-    },
-    {
-      title: 'Needs Interview',
-      value: statusCounts['Needs Interview'],
-      icon: <ScheduleIcon sx={{ color: 'warning.main' }} />,
-      color: '#ed6c02',
-      onClick: () => setModal('Needs Interview'),
-    },
-    {
-      title: 'Under Review',
-      value: statusCounts['Under Review'],
-      icon: <AssignmentIcon sx={{ color: 'info.main' }} />,
-      color: '#0288d1',
-      onClick: () => setModal('Under Review'),
-    },
-  ];
-
   // Modal content
   const renderModalContent = () => {
     if (modal === 'candidates') {
@@ -268,13 +236,6 @@ const Dashboard: React.FC = () => {
       <Typography variant="h4" sx={{ mb: 4 }}>
         Recruitment Dashboard
       </Typography>
-      <Box sx={{ display: 'flex', gap: 3, mb: 4 }}>
-        {stats.map((stat) => (
-          <Box key={stat.title} sx={{ flex: 1, minWidth: 200, display: 'flex' }}>
-            <StatCard {...stat} />
-          </Box>
-        ))}
-      </Box>
       <Paper sx={{ p: 3, mb: 4 }}>
         <Typography variant="h6" sx={{ mb: 3 }}>
           Status Breakdown

@@ -240,8 +240,8 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
           </Box>
           <Box>
             <Typography variant="subtitle2" sx={{ color: '#E31837' }}>Demographics</Typography>
-            <Typography>City: {candidate.demographics.city}</Typography>
-            <Typography>State: {candidate.demographics.state}</Typography>
+            <Typography>City: {candidate.city || 'N/A'}</Typography>
+            <Typography>State: {candidate.state || 'N/A'}</Typography>
           </Box>
           <Box>
             <Typography variant="subtitle2" sx={{ color: '#E31837' }}>Resume</Typography>

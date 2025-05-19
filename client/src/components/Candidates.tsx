@@ -34,7 +34,8 @@ import { useNavigate } from 'react-router-dom';
 // @ts-ignore
 import * as pdfjsLib from 'pdfjs-dist';
 import axiosInstance from '../utils/axios';
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  window.location.origin + '/pdf.worker.min.js';
 
 const API_BASE = process.env.REACT_APP_API_URL || '';
 

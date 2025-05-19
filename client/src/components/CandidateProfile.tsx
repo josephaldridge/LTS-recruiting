@@ -21,7 +21,8 @@ import CloseIcon from '@mui/icons-material/Close';
 // @ts-ignore
 import { Document, Page, pdfjs } from 'react-pdf';
 import axiosInstance from '../utils/axios';
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc =
+  window.location.origin + '/pdf.worker.min.js';
 
 const API_BASE = process.env.REACT_APP_API_URL || '';
 

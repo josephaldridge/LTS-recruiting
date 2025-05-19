@@ -37,6 +37,25 @@ CREATE TABLE resumes (
     uploaded_by VARCHAR(255) NOT NULL
 );
 
+-- Interviewers table
+CREATE TABLE IF NOT EXISTS interviewers (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE
+);
+
+-- Interviews table
+CREATE TABLE IF NOT EXISTS interviews (
+    id SERIAL PRIMARY KEY,
+    candidate_id INTEGER REFERENCES candidates(id) ON DELETE CASCADE,
+    interviewer_id INTEGER REFERENCES interviewers(id) ON DELETE SET NULL,
+    date DATE NOT NULL,
+    time TIME NOT NULL,
+    type VARCHAR(50),
+    status VARCHAR(50) DEFAULT 'Scheduled',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create indexes
 CREATE INDEX idx_candidates_department ON candidates(department);
 CREATE INDEX idx_candidates_status ON candidates(status);

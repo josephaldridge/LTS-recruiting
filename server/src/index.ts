@@ -9,8 +9,12 @@ import fs from 'fs';
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['https://lts-recruiting-6etcyb4sa-josephaldridges-projects.vercel.app', 'http://localhost:3000'],
+  credentials: true
+}));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../../client/public')));
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -80,11 +84,15 @@ app.get('/api/auth/protected', authenticateUser, (req: Request, res: Response) =
 import candidateRoutes from './routes/candidates';
 import noteRoutes from './routes/notes';
 import resumeRoutes from './routes/resumes';
+import interviewerRoutes from './routes/interviewers';
+import interviewRoutes from './routes/interviews';
 
 // Use routes with authentication
 app.use('/api/candidates', authenticateUser, candidateRoutes);
 app.use('/api/notes', authenticateUser, noteRoutes);
 app.use('/api/resumes', authenticateUser, resumeRoutes);
+app.use('/api/interviewers', authenticateUser, interviewerRoutes);
+app.use('/api/interviews', authenticateUser, interviewRoutes);
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

@@ -15,14 +15,16 @@ import {
   TableHead,
   TableRow,
   IconButton,
+  Grid,
 } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import {
   People as PeopleIcon,
   EventNote as EventNoteIcon,
   CheckCircle as CheckCircleIcon,
   Schedule as ScheduleIcon,
   Close as CloseIcon,
+  Assignment as AssignmentIcon,
+  Send as SendIcon,
 } from '@mui/icons-material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -36,6 +38,34 @@ const departments = [
   { label: 'Financial Products Support', value: 'financial', display: 'Financial Product Support Representative' },
   { label: 'Customer Care Center', value: 'customer', display: 'Customer Service Agent' },
 ];
+
+const statusConfig = {
+  'Needs Interview': {
+    icon: <ScheduleIcon />,
+    color: '#ed6c02',
+    modalTitle: 'Candidates Needing Interview',
+  },
+  'Interview Scheduled': {
+    icon: <EventNoteIcon />,
+    color: '#1976d2',
+    modalTitle: 'Scheduled Interviews',
+  },
+  'Under Review': {
+    icon: <AssignmentIcon />,
+    color: '#0288d1',
+    modalTitle: 'Candidates Under Review',
+  },
+  'Submitted': {
+    icon: <SendIcon />,
+    color: '#9c27b0',
+    modalTitle: 'Submitted Candidates',
+  },
+  'Hired': {
+    icon: <CheckCircleIcon />,
+    color: '#2e7d32',
+    modalTitle: 'Hired Candidates',
+  },
+};
 
 const StatCard = ({ title, value, icon, color, onClick }: any) => (
   <Card sx={{ height: '100%', cursor: 'pointer' }} onClick={onClick}>
@@ -102,6 +132,12 @@ const Dashboard: React.FC = () => {
   // Helper to get department display name
   const getDeptDisplay = (value: string) => departments.find(d => d.value === value)?.label || value;
 
+  // Get counts for each status
+  const statusCounts = Object.keys(statusConfig).reduce((acc, status) => {
+    acc[status] = candidates.filter(c => c.status === status).length;
+    return acc;
+  }, {} as Record<string, number>);
+
   // Stats
   const stats = [
     {
@@ -119,18 +155,18 @@ const Dashboard: React.FC = () => {
       onClick: () => setModal('interviews'),
     },
     {
-      title: 'Hired',
-      value: candidates.filter(c => c.status === 'Hired').length,
-      icon: <CheckCircleIcon sx={{ color: 'success.main' }} />,
-      color: '#2e7d32',
-      onClick: () => setModal('hired'),
-    },
-    {
-      title: 'Pending Review',
-      value: candidates.filter(c => c.status === 'Pending Review').length,
+      title: 'Needs Interview',
+      value: statusCounts['Needs Interview'],
       icon: <ScheduleIcon sx={{ color: 'warning.main' }} />,
       color: '#ed6c02',
-      onClick: () => setModal('pending'),
+      onClick: () => setModal('Needs Interview'),
+    },
+    {
+      title: 'Under Review',
+      value: statusCounts['Under Review'],
+      icon: <AssignmentIcon sx={{ color: 'info.main' }} />,
+      color: '#0288d1',
+      onClick: () => setModal('Under Review'),
     },
   ];
 
@@ -144,6 +180,7 @@ const Dashboard: React.FC = () => {
               <TableRow>
                 <TableCell>Name</TableCell>
                 <TableCell>Department</TableCell>
+                <TableCell>Status</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -151,6 +188,7 @@ const Dashboard: React.FC = () => {
                 <TableRow key={c.id} hover sx={{ cursor: 'pointer' }} onClick={() => { setModal(null); navigate(`/candidates/${c.id}`); }}>
                   <TableCell>{c.name}</TableCell>
                   <TableCell>{getDeptDisplay(c.department)}</TableCell>
+                  <TableCell>{c.status}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -180,8 +218,7 @@ const Dashboard: React.FC = () => {
         </TableContainer>
       );
     }
-    if (modal === 'hired' || modal === 'pending') {
-      const status = modal === 'hired' ? 'Hired' : 'Pending Review';
+    if (Object.keys(statusConfig).includes(modal || '')) {
       return (
         <TableContainer sx={{ maxHeight: 400 }}>
           <Table stickyHeader>
@@ -192,7 +229,7 @@ const Dashboard: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {candidates.filter(c => c.status === status).map((c) => (
+              {candidates.filter(c => c.status === modal).map((c) => (
                 <TableRow key={c.id} hover sx={{ cursor: 'pointer' }} onClick={() => { setModal(null); navigate(`/candidates/${c.id}`); }}>
                   <TableCell>{c.name}</TableCell>
                   <TableCell>{getDeptDisplay(c.department)}</TableCell>
@@ -218,20 +255,48 @@ const Dashboard: React.FC = () => {
           </Box>
         ))}
       </Box>
-      <Paper sx={{ mt: 4, p: 3 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          Recent Activity
+      <Paper sx={{ p: 3, mb: 4 }}>
+        <Typography variant="h6" sx={{ mb: 3 }}>
+          Status Breakdown
         </Typography>
-        <Typography color="text.secondary">
-          No recent activity to display
-        </Typography>
+        <Grid container spacing={3}>
+          {Object.entries(statusConfig).map(([status, config]) => (
+            <Grid item xs={12} sm={6} md={4} key={status}>
+              <Card 
+                sx={{ 
+                  cursor: 'pointer',
+                  '&:hover': { transform: 'translateY(-4px)', transition: 'transform 0.2s' }
+                }}
+                onClick={() => setModal(status)}
+              >
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Box
+                      sx={{
+                        backgroundColor: `${config.color}15`,
+                        borderRadius: '50%',
+                        p: 1,
+                        mr: 2,
+                      }}
+                    >
+                      {React.cloneElement(config.icon, { sx: { color: config.color } })}
+                    </Box>
+                    <Typography variant="h6">{status}</Typography>
+                  </Box>
+                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                    {statusCounts[status]}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
       </Paper>
       <Dialog open={!!modal} onClose={() => setModal(null)} maxWidth="sm" fullWidth scroll="paper">
         <DialogTitle>
           {modal === 'candidates' && 'All Candidates'}
           {modal === 'interviews' && 'Upcoming Interviews by Department'}
-          {modal === 'hired' && 'Hired Candidates'}
-          {modal === 'pending' && 'Pending Review Candidates'}
+          {Object.keys(statusConfig).includes(modal || '') && statusConfig[modal as keyof typeof statusConfig]?.modalTitle}
           <IconButton
             aria-label="close"
             onClick={() => setModal(null)}

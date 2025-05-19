@@ -33,7 +33,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 // @ts-ignore
 import * as pdfjsLib from 'pdfjs-dist';
-import axios from 'axios';
+import axiosInstance from '../utils/axios';
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 const API_BASE = process.env.REACT_APP_API_URL || '';
@@ -102,7 +102,7 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
     const fetchCandidates = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${API_BASE}/api/candidates`);
+        const res = await axiosInstance.get('/api/candidates');
         setCandidates(res.data);
       } catch (err) {
         setCandidates([]);
@@ -135,7 +135,7 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
       Object.entries(newCandidate).forEach(([key, value]) => {
         if (value) formData.append(key, value as any);
       });
-      const res = await axios.post(`${API_BASE}/api/candidates`, formData, {
+      const res = await axiosInstance.post('/api/candidates', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setCandidates(prev => [res.data, ...prev]);

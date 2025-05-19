@@ -20,7 +20,7 @@ import DialogContent from '@mui/material/DialogContent';
 import CloseIcon from '@mui/icons-material/Close';
 // @ts-ignore
 import { Document, Page, pdfjs } from 'react-pdf';
-import axios from 'axios';
+import axiosInstance from '../utils/axios';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const API_BASE = process.env.REACT_APP_API_URL || '';
@@ -110,7 +110,7 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
     const fetchCandidate = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${API_BASE}/api/candidates/${id}`);
+        const res = await axiosInstance.get(`/api/candidates/${id}`);
         setCandidate(res.data);
         setStatus(res.data.status);
       } catch (err) {
@@ -124,7 +124,7 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
   useEffect(() => {
     const fetchNotes = async () => {
       try {
-        const res = await axios.get(`${API_BASE}/api/notes/candidate/${id}`);
+        const res = await axiosInstance.get(`/api/notes/candidate/${id}`);
         setNotes(res.data);
       } catch (err) {
         setNotes([]);
@@ -136,8 +136,8 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
   useEffect(() => {
     const fetchResume = async () => {
       try {
-        const res = await axios.get(`${API_BASE}/api/resumes/candidate/${id}`, { withCredentials: true });
-        setResume(res.data.file_path); // Assuming file_path is the URL
+        const res = await axiosInstance.get(`/api/resumes/candidate/${id}`);
+        setResume(res.data.file_path);
         setResumeId(res.data.id);
       } catch (err) {
         setResume('');
@@ -152,7 +152,7 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
     setStatus(newStatus);
     if (candidate) {
       try {
-        await axios.put(`${API_BASE}/api/candidates/${id}`, { ...candidate, status: newStatus });
+        await axiosInstance.put(`/api/candidates/${id}`, { ...candidate, status: newStatus });
         setCandidate({ ...candidate, status: newStatus });
       } catch (err) {
         // Optionally show error
@@ -163,7 +163,7 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
   const handleAddNote = async () => {
     if (noteInput.trim()) {
       try {
-        const res = await axios.post(`${API_BASE}/api/notes`, { candidateId: id, text: noteInput }, { withCredentials: true });
+        const res = await axiosInstance.post('/api/notes', { candidateId: id, text: noteInput });
         setNotes([res.data, ...notes]);
         setNoteInput('');
       } catch (err) {
@@ -175,7 +175,7 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
   const handleDeleteResume = async () => {
     if (resumeId) {
       try {
-        await axios.delete(`${API_BASE}/api/resumes/${resumeId}`, { withCredentials: true });
+        await axiosInstance.delete(`/api/resumes/${resumeId}`);
         setResume('');
         setResumeId(null);
       } catch (err) {
@@ -190,9 +190,8 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
       const formData = new FormData();
       formData.append('resume', file);
       try {
-        const res = await axios.post(`${API_BASE}/api/resumes/candidate/${id}`, formData, {
+        const res = await axiosInstance.post(`/api/resumes/candidate/${id}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
-          withCredentials: true,
         });
         setResume(res.data.file_path);
         setResumeId(res.data.id);

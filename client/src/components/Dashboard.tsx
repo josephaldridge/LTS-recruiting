@@ -27,6 +27,7 @@ import {
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
+import axiosInstance from '../utils/axios';
 
 const API_BASE = process.env.REACT_APP_API_URL || '';
 
@@ -73,8 +74,8 @@ const Dashboard: React.FC = () => {
       setLoading(true);
       try {
         const [candidatesRes, interviewsRes] = await Promise.all([
-          axios.get(`${API_BASE}/api/candidates`),
-          axios.get(`${API_BASE}/api/interviews`),
+          axiosInstance.get('/api/candidates'),
+          axiosInstance.get('/api/interviews'),
         ]);
         setCandidates(candidatesRes.data);
         setInterviews(interviewsRes.data);

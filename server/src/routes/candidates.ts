@@ -1,7 +1,26 @@
 import express from 'express';
 import pool from '../db';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 
 const router = express.Router();
+
+// Configure multer for candidate resume uploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const uploadDir = path.join(__dirname, '../../temp');
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage });
 
 // Get all candidates
 router.get('/', (req, res) => {
@@ -41,9 +60,11 @@ router.get('/:id', (req, res) => {
 });
 
 // Create new candidate
-router.post('/', (req, res) => {
+router.post('/', upload.single('resume'), (req, res) => {
     (async () => {
         try {
+            // Support both JSON and multipart/form-data
+            const body = req.body || {};
             const {
                 name,
                 email,
@@ -52,7 +73,20 @@ router.post('/', (req, res) => {
                 department,
                 city,
                 state
-            } = req.body;
+            } = body;
+
+            // Optionally handle resume file
+            let resumeFileInfo = null;
+            if (req.file) {
+                resumeFileInfo = {
+                    originalname: req.file.originalname,
+                    filename: req.file.filename,
+                    path: req.file.path,
+                    size: req.file.size,
+                    mimetype: req.file.mimetype
+                };
+                // You can add logic to save resume info to DB or storage here
+            }
 
             const result = await pool.query(
                 `INSERT INTO candidates 
@@ -62,7 +96,7 @@ router.post('/', (req, res) => {
                 [name, email, phone, position, department, city, state]
             );
 
-            res.status(201).json(result.rows[0]);
+            res.status(201).json({ ...result.rows[0], resume: resumeFileInfo });
         } catch (error) {
             console.error('Error creating candidate:', error);
             res.status(500).json({ error: 'Failed to create candidate' });

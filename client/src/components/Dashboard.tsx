@@ -138,6 +138,26 @@ const Dashboard: React.FC = () => {
     return acc;
   }, {} as Record<string, number>);
 
+  // Get department breakdown
+  const departmentBreakdown = departments.reduce((acc, dept) => {
+    const deptCandidates = candidates.filter(c => c.department === dept.value);
+    acc[dept.value] = {
+      label: dept.label,
+      total: deptCandidates.length,
+      statuses: Object.keys(statusConfig).reduce((statusAcc, status) => {
+        statusAcc[status] = deptCandidates.filter(c => c.status === status).length;
+        return statusAcc;
+      }, {} as Record<string, number>)
+    };
+    return acc;
+  }, {} as Record<string, { label: string; total: number; statuses: Record<string, number> }>);
+
+  // Calculate totals
+  const totals = {
+    total: candidates.length,
+    statuses: statusCounts
+  };
+
   // Stats
   const stats = [
     {
@@ -291,6 +311,64 @@ const Dashboard: React.FC = () => {
             </Grid>
           ))}
         </Grid>
+      </Paper>
+      <Paper sx={{ p: 3, mb: 4 }}>
+        <Typography variant="h6" sx={{ mb: 3 }}>
+          Department Status Breakdown
+        </Typography>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Department</TableCell>
+                {Object.keys(statusConfig).map(status => (
+                  <TableCell key={status} align="right">{status}</TableCell>
+                ))}
+                <TableCell align="right" sx={{ fontWeight: 'bold' }}>Total</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {departments.map(dept => (
+                <TableRow key={dept.value}>
+                  <TableCell>{dept.label}</TableCell>
+                  {Object.keys(statusConfig).map(status => (
+                    <TableCell 
+                      key={status} 
+                      align="right"
+                      sx={{ 
+                        color: statusConfig[status as keyof typeof statusConfig].color,
+                        fontWeight: 'medium'
+                      }}
+                    >
+                      {departmentBreakdown[dept.value]?.statuses[status] || 0}
+                    </TableCell>
+                  ))}
+                  <TableCell align="right" sx={{ fontWeight: 'bold' }}>
+                    {departmentBreakdown[dept.value]?.total || 0}
+                  </TableCell>
+                </TableRow>
+              ))}
+              <TableRow sx={{ backgroundColor: 'rgba(0, 0, 0, 0.04)' }}>
+                <TableCell sx={{ fontWeight: 'bold' }}>Total</TableCell>
+                {Object.keys(statusConfig).map(status => (
+                  <TableCell 
+                    key={status} 
+                    align="right"
+                    sx={{ 
+                      color: statusConfig[status as keyof typeof statusConfig].color,
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {totals.statuses[status]}
+                  </TableCell>
+                ))}
+                <TableCell align="right" sx={{ fontWeight: 'bold' }}>
+                  {totals.total}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Paper>
       <Dialog open={!!modal} onClose={() => setModal(null)} maxWidth="sm" fullWidth scroll="paper">
         <DialogTitle>

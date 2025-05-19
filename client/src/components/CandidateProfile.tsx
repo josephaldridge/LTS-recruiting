@@ -107,6 +107,8 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
   const [resumeId, setResumeId] = useState<number | null>(null);
   const [resumeError, setResumeError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editMode, setEditMode] = useState(false);
+  const [editCandidate, setEditCandidate] = useState<any>(null);
 
   useEffect(() => {
     const fetchCandidate = async () => {
@@ -148,6 +150,10 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
     };
     fetchResume();
   }, [id]);
+
+  useEffect(() => {
+    if (candidate) setEditCandidate(candidate);
+  }, [candidate]);
 
   const handleStatusChange = async (e: any) => {
     const newStatus = e.target.value;
@@ -204,120 +210,197 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
     }
   };
 
+  const handleEditChange = (field: string, value: any) => {
+    setEditCandidate({ ...editCandidate, [field]: value });
+  };
+  const handleEditDemographics = (field: string, value: any) => {
+    setEditCandidate({
+      ...editCandidate,
+      demographics: { ...editCandidate.demographics, [field]: value },
+    });
+  };
+  const handleSave = async () => {
+    try {
+      await axiosInstance.put(`/api/candidates/${id}`, editCandidate);
+      setCandidate(editCandidate);
+      setEditMode(false);
+    } catch (err) {
+      // Optionally show error
+    }
+  };
+
   if (loading) return <Typography>Loading...</Typography>;
   if (!candidate) return <Typography>Candidate not found.</Typography>;
 
   return (
-    <Box sx={{ width: '100%', mt: 4, px: 3 }}>
-      <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} sx={{ mb: 2, color: '#E31837' }}>
-        Back to Candidates
+    <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4 }}>
+      <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} sx={{ mb: 2 }}>
+        Back
       </Button>
-      <Paper sx={{ p: 3, borderTop: '6px solid #E31837', mb: 3 }}>
+      <Paper sx={{ p: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <Avatar sx={{ width: 64, height: 64, bgcolor: '#E31837', mr: 2 }}>
-            {candidate.name[0]}
+          <Avatar sx={{ width: 64, height: 64, mr: 2 }}>
+            {candidate?.name?.[0]}
           </Avatar>
           <Box>
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>{candidate.name}</Typography>
-            <Typography variant="subtitle1" color="text.secondary">{departments[candidate.department as 'technical' | 'financial' | 'customer']}</Typography>
-            <Select
-              value={status}
-              onChange={handleStatusChange}
-              size="small"
-              sx={{ mt: 1, minWidth: 180, bgcolor: '#E3EFFF', borderRadius: 2 }}
-            >
-              {statusOptions.map(option => (
-                <MenuItem key={option} value={option}>{option}</MenuItem>
-              ))}
-            </Select>
+            {editMode ? (
+              <TextField
+                label="Name"
+                value={editCandidate?.name || ''}
+                onChange={e => handleEditChange('name', e.target.value)}
+                sx={{ mb: 1 }}
+              />
+            ) : (
+              <Typography variant="h5">{candidate?.name}</Typography>
+            )}
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              {editMode ? (
+                <TextField
+                  label="Email"
+                  value={editCandidate?.email || ''}
+                  onChange={e => handleEditChange('email', e.target.value)}
+                  size="small"
+                  sx={{ mr: 1 }}
+                />
+              ) : (
+                <Chip label={candidate?.email} />
+              )}
+              {editMode ? (
+                <TextField
+                  label="Phone"
+                  value={editCandidate?.phone || ''}
+                  onChange={e => handleEditChange('phone', e.target.value)}
+                  size="small"
+                />
+              ) : (
+                <Chip label={candidate?.phone} />
+              )}
+            </Box>
           </Box>
         </Box>
         <Divider sx={{ my: 2 }} />
-        <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', mb: 2 }}>
           <Box>
-            <Typography variant="subtitle2" sx={{ color: '#E31837' }}>Contact Info</Typography>
-            <Typography>Email: {candidate.email}</Typography>
-            <Typography>Phone: {candidate.phone}</Typography>
-          </Box>
-          <Box>
-            <Typography variant="subtitle2" sx={{ color: '#E31837' }}>Demographics</Typography>
-            <Typography>City: {candidate.city || 'N/A'}</Typography>
-            <Typography>State: {candidate.state || 'N/A'}</Typography>
-          </Box>
-          <Box>
-            <Typography variant="subtitle2" sx={{ color: '#E31837' }}>Resume</Typography>
-            {resume ? (
-              <Button
-                variant="outlined"
-                sx={{ borderColor: '#E31837', color: '#E31837', mt: 1 }}
-                onClick={() => { setResumeOpen(true); setResumeError(null); }}
+            <Typography variant="subtitle2">Status</Typography>
+            {editMode ? (
+              <Select
+                value={editCandidate?.status || ''}
+                onChange={e => handleEditChange('status', e.target.value)}
+                size="small"
               >
-                View Resume
-              </Button>
+                {statusOptions.map(opt => (
+                  <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                ))}
+              </Select>
             ) : (
-              <Typography>No resume uploaded.</Typography>
+              <Typography>{candidate?.status}</Typography>
+            )}
+          </Box>
+          <Box>
+            <Typography variant="subtitle2">Position</Typography>
+            {editMode ? (
+              <TextField
+                value={editCandidate?.position || ''}
+                onChange={e => handleEditChange('position', e.target.value)}
+                size="small"
+              />
+            ) : (
+              <Typography>{candidate?.position}</Typography>
+            )}
+          </Box>
+          <Box>
+            <Typography variant="subtitle2">Department</Typography>
+            {editMode ? (
+              <Select
+                value={editCandidate?.department || ''}
+                onChange={e => handleEditChange('department', e.target.value)}
+                size="small"
+              >
+                {Object.entries(departments).map(([val, label]) => (
+                  <MenuItem key={val} value={val}>{label}</MenuItem>
+                ))}
+              </Select>
+            ) : (
+              <Typography>{candidate?.department && departments.hasOwnProperty(candidate.department) ? departments[candidate.department as keyof typeof departments] : candidate?.department || 'N/A'}</Typography>
+            )}
+          </Box>
+          <Box>
+            <Typography variant="subtitle2">Location</Typography>
+            {editMode ? (
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <TextField
+                  label="City"
+                  value={editCandidate?.demographics?.city || ''}
+                  onChange={e => handleEditDemographics('city', e.target.value)}
+                  size="small"
+                />
+                <TextField
+                  label="State"
+                  value={editCandidate?.demographics?.state || ''}
+                  onChange={e => handleEditDemographics('state', e.target.value)}
+                  size="small"
+                />
+              </Box>
+            ) : (
+              <Typography>{candidate?.demographics?.city}, {candidate?.demographics?.state}</Typography>
             )}
           </Box>
         </Box>
-      </Paper>
-      <Paper sx={{ p: 3, borderLeft: '6px solid #E31837', maxHeight: 350, overflow: 'auto' }}>
-        <Typography variant="h6" sx={{ color: '#E31837', mb: 2 }}>Notes</Typography>
-        <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="Add a note..."
-            value={noteInput}
-            onChange={e => setNoteInput(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter') handleAddNote(); }}
-          />
-          <Button variant="contained" sx={{ bgcolor: '#E31837' }} onClick={handleAddNote}>Add</Button>
-        </Box>
-        <Box sx={{ maxHeight: 220, overflowY: 'auto', pr: 1 }}>
-          {notes.length === 0 && <Typography color="text.secondary">No notes yet.</Typography>}
-          {notes.map(note => (
-            <Paper key={note.id} sx={{ p: 2, mb: 2, background: '#fff7f7', borderLeft: '4px solid #E31837' }}>
-              <Typography variant="body2" sx={{ fontWeight: 500 }}>{note.text}</Typography>
-              <Typography variant="caption" color="text.secondary">{note?.created_at || note?.date} — {note?.author_email || note?.author || 'Unknown'}</Typography>
-            </Paper>
-          ))}
-        </Box>
-      </Paper>
-      <Dialog open={resumeOpen} onClose={() => setResumeOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          Resume
-          <IconButton onClick={() => setResumeOpen(false)}><CloseIcon /></IconButton>
-        </DialogTitle>
-        <DialogContent dividers sx={{ height: 600, overflow: 'auto', background: '#f5f5f5' }}>
+        <Divider sx={{ my: 2 }} />
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="subtitle2">Resume</Typography>
           {resume ? (
-            <Document
-              file={resume}
-              onLoadSuccess={({ numPages }: { numPages: number }) => { setNumPages(numPages); setResumeError(null); }}
-              loading={<Typography>Loading PDF...</Typography>}
-              error={<Typography color="error">Failed to load PDF.</Typography>}
-            >
-              {Array.from(new Array(numPages), (el, index) => (
-                <Page key={`page_${index + 1}`} pageNumber={index + 1} width={700} />
-              ))}
-            </Document>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Button variant="outlined" onClick={() => window.open(resume, '_blank')}>View Resume</Button>
+              <Button variant="outlined" component="label">
+                Upload Resume
+                <input type="file" hidden onChange={handleReplaceResume} />
+              </Button>
+              <Button color="error" onClick={handleDeleteResume}>Delete Resume</Button>
+            </Box>
           ) : (
-            <Typography color="error">No resume uploaded.</Typography>
-          )}
-          <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-            <Button color="error" variant="outlined" onClick={handleDeleteResume}>Delete Resume</Button>
             <Button variant="outlined" component="label">
-              Replace Resume
-              <input
-                type="file"
-                accept="application/pdf"
-                hidden
-                onChange={handleReplaceResume}
-              />
+              Upload Resume
+              <input type="file" hidden onChange={handleReplaceResume} />
             </Button>
+          )}
+          {resumeError && <Typography color="error">{resumeError}</Typography>}
+        </Box>
+        <Divider sx={{ my: 2 }} />
+        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+          {!editMode ? (
+            <Button variant="contained" onClick={() => setEditMode(true)}>Edit</Button>
+          ) : (
+            <Button variant="contained" color="success" onClick={handleSave}>Save</Button>
+          )}
+          {editMode && (
+            <Button variant="outlined" color="inherit" onClick={() => { setEditMode(false); setEditCandidate(candidate); }}>Cancel</Button>
+          )}
+        </Box>
+        <Paper sx={{ p: 3, borderLeft: '6px solid #E31837', maxHeight: 350, overflow: 'auto' }}>
+          <Typography variant="h6" sx={{ color: '#E31837', mb: 2 }}>Notes</Typography>
+          <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+            <TextField
+              fullWidth
+              size="small"
+              placeholder="Add a note..."
+              value={noteInput}
+              onChange={e => setNoteInput(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleAddNote(); }}
+            />
+            <Button variant="contained" sx={{ bgcolor: '#E31837' }} onClick={handleAddNote}>Add</Button>
           </Box>
-          {resumeError && <Typography color="error" sx={{ mt: 1 }}>{resumeError}</Typography>}
-        </DialogContent>
-      </Dialog>
+          <Box sx={{ maxHeight: 220, overflowY: 'auto', pr: 1 }}>
+            {notes.length === 0 && <Typography color="text.secondary">No notes yet.</Typography>}
+            {notes.map(note => (
+              <Paper key={note.id} sx={{ p: 2, mb: 2, background: '#fff7f7', borderLeft: '4px solid #E31837' }}>
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>{note.text}</Typography>
+                <Typography variant="caption" color="text.secondary">{note?.created_at || note?.date} — {note?.author_email || note?.author || 'Unknown'}</Typography>
+              </Paper>
+            ))}
+          </Box>
+        </Paper>
+      </Paper>
     </Box>
   );
 };

@@ -27,9 +27,13 @@ class OneDriveService {
 
     async uploadResume(filePath: string, fileName: string): Promise<string> {
         try {
+            const driveId = process.env.ONEDRIVE_DRIVE_ID!;
+            const folderId = process.env.ONEDRIVE_FOLDER_ID!;
+            const uploadSessionEndpoint = `/drives/${driveId}/items/${folderId}:/${fileName}:/createUploadSession`;
+            console.log('Creating upload session at endpoint:', uploadSessionEndpoint);
             const fileStream = fs.createReadStream(filePath);
             const uploadSession = await this.client
-                .api(`/me/drive/items/${config.onedrive.folderId}:/${fileName}:/createUploadSession`)
+                .api(uploadSessionEndpoint)
                 .post({});
 
             const maxSliceSize = 320 * 1024; // 320KB chunks
@@ -48,8 +52,10 @@ class OneDriveService {
             }
 
             // Get the file's web URL
+            const fileEndpoint = `/drives/${driveId}/items/${folderId}:/${fileName}`;
+            console.log('Retrieving file at endpoint:', fileEndpoint);
             const file = await this.client
-                .api(`/me/drive/items/${config.onedrive.folderId}:/${fileName}`)
+                .api(fileEndpoint)
                 .get();
 
             return file.webUrl;
@@ -61,8 +67,10 @@ class OneDriveService {
 
     async deleteResume(fileName: string): Promise<void> {
         try {
+            const driveId = process.env.ONEDRIVE_DRIVE_ID!;
+            const folderId = process.env.ONEDRIVE_FOLDER_ID!;
             await this.client
-                .api(`/me/drive/items/${config.onedrive.folderId}:/${fileName}`)
+                .api(`/drives/${driveId}/items/${folderId}:/${fileName}`)
                 .delete();
         } catch (error) {
             console.error('Error deleting from OneDrive:', error);

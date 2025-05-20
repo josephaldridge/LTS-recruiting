@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Button, TextField, Typography, Paper, CircularProgress } from '@mui/material';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import app from '../firebase';
+import logo from '../assets/liberty-tax-logo.png';
 
 const auth = getAuth(app);
 
@@ -28,7 +29,9 @@ const Login: React.FC<{ onLogin: (user: any) => void }> = ({ onLogin }) => {
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #E31837 0%, #002D72 100%)' }}>
       <Paper elevation={6} sx={{ p: 5, borderRadius: 3, minWidth: 350, maxWidth: 400, textAlign: 'center' }}>
-        <Typography variant="h4" sx={{ mb: 2, color: '#E31837', fontWeight: 700 }}>Liberty Tax</Typography>
+        <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
+          <img src={logo} alt="Liberty Tax" style={{ width: '80%', height: 'auto' }} />
+        </Box>
         <Typography variant="h6" sx={{ mb: 3, color: '#002D72' }}>Recruiting System Login</Typography>
         <form onSubmit={handleLogin}>
           <TextField

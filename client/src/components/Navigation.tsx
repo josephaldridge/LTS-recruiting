@@ -17,6 +17,7 @@ import {
   EventNote as EventNoteIcon,
   Assessment as AssessmentIcon,
 } from '@mui/icons-material';
+import icon from '../assets/liberty-tax-icon.png';
 
 const drawerWidth = 240;
 
@@ -45,13 +46,16 @@ const Navigation: React.FC = () => {
         },
       }}
     >
-      <Box sx={{ p: 2 }}>
-        <Typography variant="h6" sx={{ color: 'white' }}>
-          Liberty Tax
-        </Typography>
-        <Typography variant="subtitle2" sx={{ color: 'white' }}>
-          Recruiting System
-        </Typography>
+      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+        <img src={icon} alt="Liberty Tax" style={{ width: 40, height: 40 }} />
+        <Box>
+          <Typography variant="h6" sx={{ color: 'white' }}>
+            Liberty Tax
+          </Typography>
+          <Typography variant="subtitle2" sx={{ color: 'white' }}>
+            Recruiting System
+          </Typography>
+        </Box>
       </Box>
       <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.12)' }} />
       <List>

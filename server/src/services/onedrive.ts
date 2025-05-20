@@ -30,6 +30,9 @@ class OneDriveService {
             const driveId = process.env.ONEDRIVE_DRIVE_ID!;
             const folderId = process.env.ONEDRIVE_FOLDER_ID!;
             const uploadSessionEndpoint = `/drives/${driveId}/items/${folderId}:/${fileName}:/createUploadSession`;
+            console.log('OneDrive uploadResume called - code version:', new Date().toISOString());
+            console.log('Using driveId:', driveId);
+            console.log('Using folderId:', folderId);
             console.log('Creating upload session at endpoint:', uploadSessionEndpoint);
             const fileStream = fs.createReadStream(filePath);
             const uploadSession = await this.client

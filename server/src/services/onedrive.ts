@@ -1,4 +1,5 @@
 import { Client } from '@microsoft/microsoft-graph-client';
+import { ClientSecretCredential } from '@azure/identity';
 import { config } from '../config';
 import fs from 'fs';
 import path from 'path';
@@ -10,9 +11,13 @@ class OneDriveService {
         this.client = Client.init({
             authProvider: async (done) => {
                 try {
-                    // TODO: Implement proper OAuth2 flow with Microsoft Graph
-                    // For now, we'll use a placeholder token
-                    done(null, 'YOUR_ACCESS_TOKEN');
+                    const credential = new ClientSecretCredential(
+                        process.env.ONEDRIVE_TENANT_ID!,
+                        process.env.ONEDRIVE_CLIENT_ID!,
+                        process.env.ONEDRIVE_CLIENT_SECRET!
+                    );
+                    const token = await credential.getToken('https://graph.microsoft.com/.default');
+                    done(null, token?.token);
                 } catch (error) {
                     done(error, null);
                 }

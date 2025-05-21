@@ -7,7 +7,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc --project tsconfig.json",
+    "prebuild": "echo \"Starting build process...\" && ls -la src/",
+    "build": "tsc --project tsconfig.json --listFiles",
     "start": "node --max-old-space-size=1024 dist/index.js",
     "dev": "nodemon src/index.ts",
     "postinstall": "npm install typescript @types/node --save-dev"

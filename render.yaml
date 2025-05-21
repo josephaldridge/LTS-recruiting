@@ -5,7 +5,10 @@ services:
     buildCommand: |
       cd /opt/render/project/src/server
       npm install
+      echo "Running TypeScript build..."
       npm run build
+      echo "Build complete. Contents of dist directory:"
+      ls -la dist/
     startCommand: cd /opt/render/project/src/server; npm start
     envVars:
       - key: NODE_ENV

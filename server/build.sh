@@ -12,12 +12,6 @@ if [ ! -f "package.json" ]; then
     exit 1
 fi
 
-echo "Installing dependencies..."
-npm install
-
-echo "Installing TypeScript and required types..."
-npm install typescript @types/node --save-dev
-
 echo "TypeScript version:"
 npx tsc --version
 
@@ -27,8 +21,11 @@ if [ ! -f "tsconfig.json" ]; then
     exit 1
 fi
 
+echo "Contents of src directory:"
+ls -la src/
+
 echo "Compiling TypeScript..."
-npx tsc --project tsconfig.json
+npx tsc --project tsconfig.json --listFiles
 
 echo "Contents of current directory after build:"
 ls -la
@@ -44,7 +41,8 @@ fi
 echo "Verifying dist/index.js exists:"
 if [ -f "dist/index.js" ]; then
     echo "dist/index.js exists"
-    cat dist/index.js | head -n 5
+    echo "First few lines of dist/index.js:"
+    head -n 5 dist/index.js
 else
     echo "ERROR: dist/index.js does not exist"
     exit 1

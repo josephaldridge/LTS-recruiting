@@ -24,4 +24,10 @@ services:
     startCommand: cd /opt/render/project/src/server; node --max-old-space-size=1024 dist/index.js
     envVars:
       - key: NODE_ENV
-        value: production 
+        value: production
+      - key: RENDER_BUILD_COMMAND
+        value: |
+          cd /opt/render/project/src/server
+          npm install
+          npm install typescript @types/node --save-dev
+          npx tsc --project tsconfig.json 

@@ -23,12 +23,11 @@ export const config = {
         privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
     },
     
-    // OneDrive for Business
-    onedrive: {
-        clientId: process.env.ONEDRIVE_CLIENT_ID,
-        clientSecret: process.env.ONEDRIVE_CLIENT_SECRET,
-        tenantId: process.env.ONEDRIVE_TENANT_ID,
-        folderId: process.env.ONEDRIVE_FOLDER_ID,
+    // Google Drive
+    googleDrive: {
+        clientEmail: process.env.GOOGLE_CLIENT_EMAIL,
+        privateKey: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        folderId: process.env.GOOGLE_DRIVE_FOLDER_ID,
     },
     
     // File upload

@@ -3,7 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import pool from '../db';
-import onedriveService from '../services/onedrive';
+import googledriveService from '../services/googledrive';
 import { config } from '../config';
 import { authenticateUser } from '../middleware/auth';
 
@@ -94,8 +94,8 @@ router.post('/candidate/:candidateId', authenticateUser, upload.single('resume')
                 return res.status(401).json({ error: 'User not authenticated' });
             }
 
-            // Upload to OneDrive
-            const onedriveUrl = await onedriveService.uploadResume(
+            // Upload to Google Drive
+            const driveUrl = await googledriveService.uploadResume(
                 file.path,
                 `${candidateId}-${file.filename}`
             );
@@ -109,7 +109,7 @@ router.post('/candidate/:candidateId', authenticateUser, upload.single('resume')
                 [
                     candidateId,
                     file.originalname,
-                    onedriveUrl,
+                    driveUrl,
                     file.size,
                     file.mimetype,
                     req.user.email
@@ -151,8 +151,8 @@ router.delete('/:id', authenticateUser, (req, res) => {
                 return res.status(404).json({ error: 'Resume not found' });
             }
 
-            // Delete from OneDrive
-            await onedriveService.deleteResume(resumeResult.rows[0].file_name);
+            // Delete from Google Drive
+            await googledriveService.deleteResume(resumeResult.rows[0].file_name);
 
             // Delete from database
             await pool.query(

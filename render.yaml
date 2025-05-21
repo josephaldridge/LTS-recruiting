@@ -5,11 +5,10 @@ services:
     buildCommand: |
       cd /opt/render/project/src/server
       npm install
-      echo "Running TypeScript build..."
-      npm run build
-      echo "Build complete. Contents of dist directory:"
+      npm install typescript @types/node --save-dev
+      npx tsc --project tsconfig.json
       ls -la dist/
-    startCommand: cd /opt/render/project/src/server; npm start
+    startCommand: cd /opt/render/project/src/server; node --max-old-space-size=1024 dist/index.js
     envVars:
       - key: NODE_ENV
         value: production 

@@ -319,7 +319,19 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
               onChange={e => setNewCandidate({ ...newCandidate, position: e.target.value })} 
             />
             <TextField label="City" fullWidth value={newCandidate.city} onChange={e => setNewCandidate({ ...newCandidate, city: e.target.value })} />
-            <TextField label="State" fullWidth value={newCandidate.state} onChange={e => setNewCandidate({ ...newCandidate, state: e.target.value })} />
+            <TextField 
+              label="State" 
+              fullWidth 
+              value={newCandidate.state} 
+              onChange={e => {
+                const value = e.target.value.toUpperCase();
+                if (value.length <= 2) {
+                  setNewCandidate({ ...newCandidate, state: value });
+                }
+              }}
+              inputProps={{ maxLength: 2 }}
+              helperText="Enter 2-letter state code (e.g., TX, CA)"
+            />
             <Button variant="outlined" component="label" sx={{ borderColor: '#E31837', color: '#E31837' }}>
               Upload Resume
               <input

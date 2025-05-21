@@ -5,10 +5,8 @@ services:
     buildCommand: |
       cd /opt/render/project/src/server
       npm install
-      npm install typescript @types/node --save-dev
-      chmod +x build.sh
-      ./build.sh
-    startCommand: cd /opt/render/project/src/server; node --max-old-space-size=1024 dist/index.js
+      npm run build
+    startCommand: cd /opt/render/project/src/server; npm start
     envVars:
       - key: NODE_ENV
         value: production 

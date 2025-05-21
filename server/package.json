@@ -7,9 +7,10 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
+    "build": "tsc --project tsconfig.json",
     "start": "node --max-old-space-size=1024 dist/index.js",
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon src/index.ts",
+    "postinstall": "npm install typescript @types/node --save-dev"
   },
   "keywords": [],
   "author": "",

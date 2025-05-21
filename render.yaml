@@ -5,7 +5,10 @@ services:
     buildCommand: |
       cd server
       npm install
-      npx tsc
+      npm install -g typescript
+      tsc --version
+      tsc
+      ls -la dist/
     startCommand: cd server && npm start
     envVars:
       - key: NODE_ENV

@@ -136,6 +136,10 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
 
   const handleAddCandidate = async () => {
     try {
+      if (!newCandidate.position) {
+        alert('Position is required');
+        return;
+      }
       let formData = new FormData();
       Object.entries(newCandidate).forEach(([key, value]) => {
         if (value) formData.append(key, value as any);
@@ -149,7 +153,6 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
         name: '', email: '', phone: '', department: '', position: '', city: '', state: '', resume: null,
       });
     } catch (err) {
-      // Optionally handle error
       alert('Failed to add candidate.');
     }
   };
@@ -308,7 +311,13 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
                 ))}
               </Select>
             </FormControl>
-            <TextField label="Position" fullWidth value={newCandidate.position} onChange={e => setNewCandidate({ ...newCandidate, position: e.target.value })} />
+            <TextField 
+              label="Position" 
+              fullWidth 
+              required
+              value={newCandidate.position} 
+              onChange={e => setNewCandidate({ ...newCandidate, position: e.target.value })} 
+            />
             <TextField label="City" fullWidth value={newCandidate.city} onChange={e => setNewCandidate({ ...newCandidate, city: e.target.value })} />
             <TextField label="State" fullWidth value={newCandidate.state} onChange={e => setNewCandidate({ ...newCandidate, state: e.target.value })} />
             <Button variant="outlined" component="label" sx={{ borderColor: '#E31837', color: '#E31837' }}>

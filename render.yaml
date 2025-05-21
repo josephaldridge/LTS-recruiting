@@ -2,7 +2,10 @@ services:
   - type: web
     name: lts-recruiting-server
     env: node
-    buildCommand: cd server && chmod +x build.sh && ./build.sh
+    buildCommand: |
+      cd server
+      npm install
+      npx tsc
     startCommand: cd server && npm start
     envVars:
       - key: NODE_ENV

@@ -2,32 +2,8 @@ services:
   - type: web
     name: lts-recruiting-server
     env: node
-    buildCommand: |
-      cd /opt/render/project/src/server
-      echo "Current directory: $(pwd)"
-      echo "Contents of current directory:"
-      ls -la
-      echo "Installing dependencies..."
-      npm install
-      echo "Installing TypeScript..."
-      npm install typescript @types/node --save-dev
-      echo "Contents of src directory:"
-      ls -la src/
-      echo "Compiling TypeScript..."
-      npx tsc --project tsconfig.json --listFiles
-      echo "Contents of dist directory after compilation:"
-      ls -la dist/
-      if [ ! -f "dist/index.js" ]; then
-        echo "ERROR: dist/index.js not found after compilation"
-        exit 1
-      fi
-    startCommand: cd /opt/render/project/src/server; node --max-old-space-size=1024 dist/index.js
+    buildCommand: cd /opt/render/project/src/server && npm run build
+    startCommand: cd /opt/render/project/src/server && npm start
     envVars:
       - key: NODE_ENV
-        value: production
-      - key: RENDER_BUILD_COMMAND
-        value: |
-          cd /opt/render/project/src/server
-          npm install
-          npm install typescript @types/node --save-dev
-          npx tsc --project tsconfig.json 
+        value: production 

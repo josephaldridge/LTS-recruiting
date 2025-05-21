@@ -2,7 +2,7 @@ services:
   - type: web
     name: lts-recruiting-server
     env: node
-    buildCommand: cd /opt/render/project/src/server && npm run build
+    buildCommand: cd /opt/render/project/src/server && npm install && npm run build
     startCommand: cd /opt/render/project/src/server && npm start
     envVars:
       - key: NODE_ENV

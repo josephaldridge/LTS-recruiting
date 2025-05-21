@@ -6,7 +6,7 @@ services:
       cd server
       chmod +x build.sh
       ./build.sh
-    startCommand: cd server && npm start
+    startCommand: cd server && node --max-old-space-size=1024 dist/index.js
     envVars:
       - key: NODE_ENV
         value: production 

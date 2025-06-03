@@ -267,7 +267,7 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
                   onClick={() => navigate(`/candidates/${candidate.id}`)}
                 >
                   <TableCell>{candidate.name}</TableCell>
-                  <TableCell>{departments.find(d => d.value === candidate.department)?.display}</TableCell>
+                  <TableCell>{departments.find(d => d.value === candidate.department)?.label}</TableCell>
                   <TableCell>{candidate.position}</TableCell>
                   <TableCell>
                     <Chip

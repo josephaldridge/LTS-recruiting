@@ -59,13 +59,13 @@ function App() {
         <LogoutButton user={user} />
         <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-appleGray to-white font-sans flex">
           {/* Sidebar */}
-          <div className="hidden md:flex flex-col w-64 h-full bg-gradient-to-b from-blue-200/70 to-blue-400/60 backdrop-blur-xl border-r border-blue-100 shadow-xl p-6">
+          <div className="hidden md:flex flex-col w-64 h-full bg-white/70 backdrop-blur-lg border border-blue-100 shadow-glass rounded-2xl mt-8 ml-8">
             <Navigation />
           </div>
           {/* Main Content */}
           <div className="flex-1 flex flex-col min-h-screen">
-            <div className="flex-1 flex flex-col p-4 md:p-8">
-              <Box component="main" className="flex-1 flex flex-col w-full">
+            <div className="flex-1 flex flex-col px-2 md:px-8 mt-24">
+              <Box component="main" className="flex-1 flex flex-col w-full max-w-7xl mx-auto">
                 <Routes>
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/candidates" element={<Candidates user={user} />} />

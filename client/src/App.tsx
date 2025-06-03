@@ -57,7 +57,7 @@ function App() {
       <CssBaseline />
       <Router>
         <LogoutButton user={user} />
-        <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-appleGray to-white font-sans flex">
+        <div className="min-h-screen w-full font-sans flex">
           {/* Sidebar */}
           <div className="hidden md:flex flex-col w-64 h-full bg-white/70 backdrop-blur-lg border border-blue-100 shadow-glass rounded-2xl mt-8 ml-8">
             <Navigation />

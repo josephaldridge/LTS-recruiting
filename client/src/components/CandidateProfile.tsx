@@ -12,12 +12,19 @@ import {
   IconButton,
   Select,
   MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  ListItemIcon,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import CloseIcon from '@mui/icons-material/Close';
+import EmailIcon from '@mui/icons-material/Email';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 // @ts-ignore
 import { Document, Page, pdfjs } from 'react-pdf';
 import axiosInstance from '../utils/axios';
@@ -100,6 +107,37 @@ const hiringLocations = [
   'Remote',
 ];
 
+const emailTemplates = [
+  {
+    key: 'missed_interview',
+    label: 'Missed Interview Call',
+    subject: 'We Missed You - Interview Scheduling',
+    body: (candidate: any) =>
+      `Hi ${candidate?.name || ''},\n\nWe tried to reach you today to schedule your interview for the ${candidate?.position || 'open'} position at Liberty Tax. Please call us back at your earliest convenience so we can move forward with your application.\n\nThank you,\nLiberty Tax Recruiting Team`,
+  },
+  {
+    key: 'adp_application',
+    label: 'Complete ADP Application',
+    subject: 'Action Required: Complete Your Official Application',
+    body: (candidate: any) =>
+      `Hi ${candidate?.name || ''},\n\nThank you for your interest in joining Liberty Tax. Please complete your official application using the following link: [Insert ADP Link Here].\n\nIf you have any questions or need assistance, feel free to reply to this email.\n\nBest regards,\nLiberty Tax Recruiting Team`,
+  },
+  {
+    key: 'second_interview',
+    label: 'Schedule Second Interview',
+    subject: "Let's Schedule Your Second Interview",
+    body: (candidate: any) =>
+      `Hi ${candidate?.name || ''},\n\nWe were impressed with your initial interview and would like to schedule a second interview to discuss the next steps. Please reply with your availability, and we'll do our best to accommodate.\n\nLooking forward to speaking with you again!\n\nBest,\nLiberty Tax Recruiting Team`,
+  },
+  {
+    key: 'general_missed_call',
+    label: 'General Missed Call',
+    subject: 'We Tried to Reach You',
+    body: (candidate: any) =>
+      `Hi ${candidate?.name || ''},\n\nWe tried to reach you today regarding your application for the ${candidate?.position || 'open'} position. Please return our call at your convenience.\n\nThank you,\nLiberty Tax Recruiting Team`,
+  },
+];
+
 const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -115,6 +153,11 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [editCandidate, setEditCandidate] = useState<any>(null);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const [emailContent, setEmailContent] = useState('');
+  const [emailSubject, setEmailSubject] = useState('');
+  const [copySuccess, setCopySuccess] = useState(false);
 
   useEffect(() => {
     const fetchCandidate = async () => {
@@ -245,6 +288,29 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
     return `${city}, ${state}`;
   };
 
+  const handleOpenEmailModal = () => {
+    setEmailModalOpen(true);
+    setSelectedTemplate(null);
+    setEmailContent('');
+    setEmailSubject('');
+    setCopySuccess(false);
+  };
+  const handleSelectTemplate = (template: any) => {
+    setSelectedTemplate(template.key);
+    setEmailContent(template.body(candidate));
+    setEmailSubject(template.subject);
+    setCopySuccess(false);
+  };
+  const handleCopy = () => {
+    navigator.clipboard.writeText(emailContent);
+    setCopySuccess(true);
+    setTimeout(() => setCopySuccess(false), 2000);
+  };
+  const handleSendMail = () => {
+    const mailto = `mailto:${candidate?.email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailContent)}`;
+    window.open(mailto, '_blank');
+  };
+
   if (loading) return <Typography>Loading...</Typography>;
   if (!candidate) return <Typography>Candidate not found.</Typography>;
 
@@ -359,6 +425,14 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
             </Box>
           </Box>
           <Box className="flex gap-4 items-center ml-auto">
+            <Button
+              variant="contained"
+              startIcon={<EmailIcon />}
+              className="bg-appleAccent hover:bg-blue-600 rounded-full px-6 py-2 text-white font-medium transition shadow"
+              onClick={handleOpenEmailModal}
+            >
+              Send Email
+            </Button>
             {!editMode ? (
               <Button variant="contained" onClick={() => setEditMode(true)}>Edit</Button>
             ) : (
@@ -414,6 +488,38 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
           </Box>
         </Paper>
       </Paper>
+      {/* Email Template Modal */}
+      <Dialog open={emailModalOpen} onClose={() => setEmailModalOpen(false)} maxWidth="sm" fullWidth PaperProps={{ className: 'bg-white/80 backdrop-blur-lg rounded-2xl shadow-glass border border-blue-100' }}>
+        <DialogTitle className="text-xl font-semibold text-gray-900">Send Email to {candidate?.name}</DialogTitle>
+        <DialogContent>
+          {!selectedTemplate ? (
+            <List>
+              {emailTemplates.map((template) => (
+                <ListItem key={template.key} disablePadding>
+                  <ListItemButton onClick={() => handleSelectTemplate(template)}>
+                    <ListItemIcon><EmailIcon /></ListItemIcon>
+                    <ListItemText primary={template.label} />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+          ) : (
+            <Box className="flex flex-col gap-4 mt-2">
+              <Typography variant="subtitle2">Subject</Typography>
+              <TextField value={emailSubject} onChange={e => setEmailSubject(e.target.value)} fullWidth />
+              <Typography variant="subtitle2">Email Body</Typography>
+              <TextField value={emailContent} onChange={e => setEmailContent(e.target.value)} fullWidth multiline minRows={6} />
+              <Box className="flex gap-2 mt-2">
+                <Button variant="contained" color="primary" onClick={handleSendMail} startIcon={<EmailIcon />}>Send this email</Button>
+                <Button variant="outlined" onClick={handleCopy} startIcon={<ContentCopyIcon />}>{copySuccess ? 'Copied!' : 'Copy to Clipboard'}</Button>
+              </Box>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEmailModalOpen(false)} className="rounded-full px-6 py-2 bg-white/40 hover:bg-white/60 text-gray-900 font-medium transition">Close</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

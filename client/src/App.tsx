@@ -65,7 +65,7 @@ function App() {
           {/* Main Content */}
           <div className="flex-1 flex flex-col min-h-screen">
             <div className="flex-1 flex flex-col px-2 md:px-8 mt-24">
-              <Box component="main" className="flex-1 flex flex-col w-full max-w-7xl mx-auto">
+              <Box component="main" className="flex-1 flex flex-col w-full">
                 <Routes>
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/candidates" element={<Candidates user={user} />} />

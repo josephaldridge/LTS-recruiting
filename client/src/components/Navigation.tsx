@@ -33,7 +33,7 @@ const Navigation: React.FC = () => {
   const location = useLocation();
 
   return (
-    <nav className="flex flex-col gap-2 h-full">
+    <nav className="flex flex-col gap-2 h-full pt-6">
       <Box className="flex items-center gap-3 mb-8">
         <img src={icon} alt="Liberty Tax" className="w-10 h-10" />
         <div>

@@ -3,6 +3,7 @@ import pool from '../db';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import googledriveService from '../services/googledrive';
 
 const router = express.Router();
 
@@ -71,8 +72,7 @@ router.post('/', upload.single('resume'), (req, res) => {
                 phone,
                 position,
                 department,
-                city,
-                state
+                hiring_location
             } = body;
 
             // Check for duplicate email
@@ -83,26 +83,52 @@ router.post('/', upload.single('resume'), (req, res) => {
 
             // Optionally handle resume file
             let resumeFileInfo = null;
-            if (req.file) {
-                resumeFileInfo = {
-                    originalname: req.file.originalname,
-                    filename: req.file.filename,
-                    path: req.file.path,
-                    size: req.file.size,
-                    mimetype: req.file.mimetype
-                };
-                // You can add logic to save resume info to DB or storage here
-            }
+            let resumeDbRow = null;
+            const clientEmail = (req as any).user?.email || email;
 
             const result = await pool.query(
                 `INSERT INTO candidates 
-                (name, email, phone, position, department, city, state)
-                VALUES ($1, $2, $3, $4, $5, $6, $7)
+                (name, email, phone, position, department, hiring_location)
+                VALUES ($1, $2, $3, $4, $5, $6)
                 RETURNING *`,
-                [name, email, phone, position, department, city, state]
+                [name, email, phone, position, department, hiring_location]
             );
+            const candidate = result.rows[0];
 
-            res.status(201).json({ ...result.rows[0], resume: resumeFileInfo });
+            if (req.file) {
+                // Check if a resume already exists for this candidate
+                const existingResume = await pool.query(
+                  'SELECT id FROM resumes WHERE candidate_id = $1',
+                  [candidate.id]
+                );
+                if (existingResume.rows.length === 0) {
+                    // Upload to Google Drive
+                    const driveUrl = await googledriveService.uploadResume(
+                        req.file.path,
+                        `${candidate.id}-${req.file.filename}`
+                    );
+                    // Save to database
+                    const resumeResult = await pool.query(
+                        `INSERT INTO resumes 
+                        (candidate_id, file_name, file_path, file_size, mime_type, uploaded_by)
+                        VALUES ($1, $2, $3, $4, $5, $6)
+                        RETURNING *`,
+                        [
+                            candidate.id,
+                            req.file.originalname,
+                            driveUrl,
+                            req.file.size,
+                            req.file.mimetype,
+                            clientEmail
+                        ]
+                    );
+                    resumeDbRow = resumeResult.rows[0];
+                    // Clean up temporary file
+                    try { fs.unlinkSync(req.file.path); } catch (cleanupError) { console.error('Error cleaning up temporary file:', cleanupError); }
+                }
+            }
+
+            res.status(201).json({ ...candidate, resume: resumeDbRow });
         } catch (error) {
             console.error('Error creating candidate:', error);
             res.status(500).json({ error: 'Failed to create candidate' });
@@ -122,17 +148,16 @@ router.put('/:id', (req, res) => {
                 status,
                 position,
                 department,
-                city,
-                state
+                hiring_location
             } = req.body;
 
             const result = await pool.query(
                 `UPDATE candidates 
                 SET name = $1, email = $2, phone = $3, status = $4,
-                    position = $5, department = $6, city = $7, state = $8
-                WHERE id = $9
+                    position = $5, department = $6, hiring_location = $7
+                WHERE id = $8
                 RETURNING *`,
-                [name, email, phone, status, position, department, city, state, id]
+                [name, email, phone, status, position, department, hiring_location, id]
             );
 
             if (result.rows.length === 0) {

@@ -94,6 +94,12 @@ const statusOptions = [
   'Hired',
 ];
 
+const hiringLocations = [
+  'Virginia Beach',
+  'Hurst',
+  'Remote',
+];
+
 const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -338,26 +344,31 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
               )}
             </Box>
             <Box>
-              <Typography variant="subtitle2">Location</Typography>
+              <Typography variant="subtitle2">Hiring Location</Typography>
               {editMode ? (
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  <TextField
-                    label="City"
-                    value={editCandidate?.demographics?.city || ''}
-                    onChange={e => handleEditDemographics('city', e.target.value)}
-                    size="small"
-                  />
-                  <TextField
-                    label="State"
-                    value={editCandidate?.demographics?.state || ''}
-                    onChange={e => handleEditDemographics('state', e.target.value)}
-                    size="small"
-                  />
-                </Box>
+                <Select
+                  value={editCandidate?.hiring_location || ''}
+                  onChange={e => handleEditChange('hiring_location', e.target.value)}
+                  size="small"
+                >
+                  {hiringLocations.map(loc => (
+                    <MenuItem key={loc} value={loc}>{loc}</MenuItem>
+                  ))}
+                </Select>
               ) : (
-                <Typography>{getLocation()}</Typography>
+                <Typography>{candidate?.hiring_location || 'N/A'}</Typography>
               )}
             </Box>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', ml: 'auto' }}>
+            {!editMode ? (
+              <Button variant="contained" onClick={() => setEditMode(true)}>Edit</Button>
+            ) : (
+              <Button variant="contained" color="success" onClick={handleSave}>Save</Button>
+            )}
+            {editMode && (
+              <Button variant="outlined" color="inherit" onClick={() => { setEditMode(false); setEditCandidate(candidate); }}>Cancel</Button>
+            )}
           </Box>
         </Box>
         <Divider sx={{ my: 2 }} />
@@ -381,16 +392,6 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
           {resumeError && <Typography color="error">{resumeError}</Typography>}
         </Box>
         <Divider sx={{ my: 2 }} />
-        <Box sx={{ display: 'flex', gap: 2, mb: 2, width: '100%' }}>
-          {!editMode ? (
-            <Button variant="contained" onClick={() => setEditMode(true)}>Edit</Button>
-          ) : (
-            <Button variant="contained" color="success" onClick={handleSave}>Save</Button>
-          )}
-          {editMode && (
-            <Button variant="outlined" color="inherit" onClick={() => { setEditMode(false); setEditCandidate(candidate); }}>Cancel</Button>
-          )}
-        </Box>
         <Paper sx={{ p: 3, borderLeft: '6px solid #E31837', maxHeight: 350, overflow: 'auto', background: '#fafbfc', width: '100%' }}>
           <Typography variant="h6" sx={{ color: '#E31837', mb: 2 }}>Notes</Typography>
           <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>

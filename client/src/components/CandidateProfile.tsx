@@ -249,11 +249,11 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
   if (!candidate) return <Typography>Candidate not found.</Typography>;
 
   return (
-    <Box className="w-full max-w-4xl mx-auto mt-8">
+    <Box className="w-full mx-auto mt-8">
       <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} className="mb-4 bg-white/40 hover:bg-white/60 text-gray-900 rounded-full px-6 py-2 font-medium transition shadow">
         Back
       </Button>
-      <Paper className="p-8 rounded-2xl shadow-glass border border-blue-100 bg-white/80 backdrop-blur-lg">
+      <Paper className="p-8 rounded-2xl shadow-glass border border-blue-100 bg-white/80 backdrop-blur-lg w-full">
         {/* Summary Bar */}
         <Box className="flex items-center gap-8 mb-6 flex-wrap">
           <Avatar className="w-20 h-20 mr-6 text-4xl bg-white/60 text-gray-900 shadow">{candidate?.name?.[0]}</Avatar>

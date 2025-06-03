@@ -232,7 +232,7 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <Box className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-glass border border-blue-100 p-6 w-full max-w-7xl mx-auto">
+    <Box className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-glass border border-blue-100 p-4 w-full mx-auto mt-2">
       <Typography variant="h4" className="text-3xl font-semibold mb-4 text-gray-900 tracking-tight">Dashboard</Typography>
       <Paper sx={{ p: 3, mb: 4 }}>
         <Typography variant="h6" sx={{ mb: 3 }}>

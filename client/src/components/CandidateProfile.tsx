@@ -315,7 +315,7 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
   if (!candidate) return <Typography>Candidate not found.</Typography>;
 
   return (
-    <Box className="w-full max-w-6xl mx-auto mt-4 px-2 sm:px-4 md:px-8">
+    <Box className="w-full mx-auto mt-4 px-0">
       <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} className="mb-4 bg-white/40 hover:bg-white/60 text-gray-900 rounded-full px-6 py-2 font-medium transition shadow">
         Back
       </Button>

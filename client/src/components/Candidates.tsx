@@ -189,19 +189,19 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
   };
 
   return (
-    <Box>
-      <Box sx={{ display: 'flex', flexDirection: 'column', mb: 3 }}>
-        <Typography variant="h4" sx={{ mb: 2 }}>Candidates</Typography>
+    <Box className="bg-appleGlass backdrop-blur-md rounded-2xl shadow-glass border border-appleBorder p-6">
+      <Box className="flex flex-col mb-6">
+        <Typography variant="h4" className="text-3xl font-semibold mb-4 text-gray-900 tracking-tight">Candidates</Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          sx={{ backgroundColor: '#E31837', width: 'fit-content', mb: 2, '&:hover': { backgroundColor: '#b00000' } }}
+          className="bg-white/40 hover:bg-white/60 text-gray-900 rounded-full px-6 py-2 w-fit mb-4 transition font-medium shadow"
           onClick={() => setOpenDialog(true)}
         >
           Add Candidate
         </Button>
       </Box>
-      <Box sx={{ mb: 2, display: 'flex', gap: 2 }}>
+      <Box className="mb-4 flex gap-4">
         <TextField
           select
           label="Filter by Department"
@@ -227,7 +227,7 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
           ))}
         </TextField>
       </Box>
-      <Paper sx={{ mb: 3, p: 2 }}>
+      <Paper className="mb-6 p-3 bg-white/30 rounded-xl shadow border border-appleBorder">
         <TextField
           fullWidth
           variant="outlined"
@@ -243,7 +243,7 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
           }}
         />
       </Paper>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} className="bg-white/30 rounded-xl shadow border border-appleBorder">
         <Table>
           <TableHead>
             <TableRow sx={{ backgroundColor: '#E31837' }}>
@@ -308,9 +308,9 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
       </TableContainer>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Add New Candidate</DialogTitle>
+        <DialogTitle className="text-2xl font-semibold text-gray-900">Add New Candidate</DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+          <Box className="flex flex-col gap-4 mt-2">
             <TextField label="Name" fullWidth value={newCandidate.name} onChange={e => setNewCandidate({ ...newCandidate, name: e.target.value })} />
             <TextField label="Email" fullWidth value={newCandidate.email} onChange={e => { setNewCandidate({ ...newCandidate, email: e.target.value }); setEmailError(''); }} error={!!emailError} helperText={emailError} />
             <TextField label="Phone" fullWidth value={newCandidate.phone} onChange={e => setNewCandidate({ ...newCandidate, phone: e.target.value })} />
@@ -359,8 +359,8 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button variant="contained" sx={{ bgcolor: '#E31837' }} onClick={handleAddCandidate}>Add</Button>
+          <Button onClick={() => setOpenDialog(false)} className="rounded-full px-6 py-2 bg-white/40 hover:bg-white/60 text-gray-900 font-medium transition">Cancel</Button>
+          <Button variant="contained" className="bg-appleAccent hover:bg-blue-600 rounded-full px-6 py-2 text-white font-medium transition" onClick={handleAddCandidate}>Add</Button>
         </DialogActions>
       </Dialog>
 

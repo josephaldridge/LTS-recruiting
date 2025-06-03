@@ -57,18 +57,33 @@ function App() {
       <CssBaseline />
       <Router>
         <LogoutButton user={user} />
-        <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-          <Navigation />
-          <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/candidates" element={<Candidates user={user} />} />
-              <Route path="/candidates/:id" element={<CandidateProfile user={user} />} />
-              <Route path="/interviews" element={<Interviews />} />
-              <Route path="/reports" element={<Reports />} />
-            </Routes>
-          </Box>
-        </Box>
+        <div className="min-h-screen bg-gradient-to-br from-appleGray to-white font-sans">
+          <div className="max-w-7xl mx-auto px-4 py-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="col-span-2 md:col-span-2 lg:col-span-2">
+                <div className="bg-appleGlass backdrop-blur-md rounded-2xl shadow-glass border border-appleBorder p-8 mb-8">
+                  <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+                    <Navigation />
+                    <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+                      <Routes>
+                        <Route path="/" element={<Dashboard />} />
+                        <Route path="/candidates" element={<Candidates user={user} />} />
+                        <Route path="/candidates/:id" element={<CandidateProfile user={user} />} />
+                        <Route path="/interviews" element={<Interviews />} />
+                        <Route path="/reports" element={<Reports />} />
+                      </Routes>
+                    </Box>
+                  </Box>
+                </div>
+              </div>
+              <div className="hidden lg:block">
+                <div className="bg-appleGlass backdrop-blur-md rounded-2xl shadow-glass border border-appleBorder p-8">
+                  {/* Sidebar or extra info */}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </Router>
     </ThemeProvider>
   );

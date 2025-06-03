@@ -33,19 +33,7 @@ const Navigation: React.FC = () => {
   const location = useLocation();
 
   return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        '& .MuiDrawer-paper': {
-          width: drawerWidth,
-          boxSizing: 'border-box',
-          backgroundColor: 'secondary.main',
-          color: 'white',
-        },
-      }}
-    >
+    <nav className="bg-appleGlass backdrop-blur-md rounded-2xl shadow-glass border border-appleBorder p-6 flex flex-col gap-4 min-h-screen">
       <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
         <img src={icon} alt="Liberty Tax" style={{ width: 40, height: 40 }} />
         <Box>
@@ -76,7 +64,7 @@ const Navigation: React.FC = () => {
           </ListItem>
         ))}
       </List>
-    </Drawer>
+    </nav>
   );
 };
 

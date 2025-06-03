@@ -249,17 +249,15 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
   if (!candidate) return <Typography>Candidate not found.</Typography>;
 
   return (
-    <Box sx={{ width: '100%', mt: 4 }}>
-      <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} sx={{ mb: 2 }}>
+    <Box className="w-full mt-8">
+      <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} className="mb-4 bg-white/40 hover:bg-white/60 text-gray-900 rounded-full px-6 py-2 font-medium transition shadow">
         Back
       </Button>
-      <Paper sx={{ p: 4, borderRadius: 2, boxShadow: 2 }}>
+      <Paper className="p-8 rounded-2xl shadow-glass border border-appleBorder bg-appleGlass backdrop-blur-md">
         {/* Summary Bar */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 4, mb: 3, flexWrap: 'wrap' }}>
-          <Avatar sx={{ width: 80, height: 80, mr: 3, fontSize: 36 }}>
-            {candidate?.name?.[0]}
-          </Avatar>
-          <Box sx={{ flex: 1, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+        <Box className="flex items-center gap-8 mb-6 flex-wrap">
+          <Avatar className="w-20 h-20 mr-6 text-4xl bg-white/60 text-gray-900 shadow">{candidate?.name?.[0]}</Avatar>
+          <Box className="flex-1 flex flex-wrap gap-8">
             <Box>
               <Typography variant="subtitle2">Name</Typography>
               {editMode ? (
@@ -360,7 +358,7 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
               )}
             </Box>
           </Box>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', ml: 'auto' }}>
+          <Box className="flex gap-4 items-center ml-auto">
             {!editMode ? (
               <Button variant="contained" onClick={() => setEditMode(true)}>Edit</Button>
             ) : (
@@ -371,11 +369,11 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
             )}
           </Box>
         </Box>
-        <Divider sx={{ my: 2 }} />
-        <Box sx={{ mb: 2 }}>
+        <Divider className="my-6" />
+        <Box className="mb-4">
           <Typography variant="subtitle2">Resume</Typography>
           {resume ? (
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            <Box className="flex gap-4 items-center">
               <Button variant="outlined" onClick={() => window.open(resume, '_blank')}>View Resume</Button>
               <Button variant="outlined" component="label">
                 Upload Resume
@@ -391,10 +389,10 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
           )}
           {resumeError && <Typography color="error">{resumeError}</Typography>}
         </Box>
-        <Divider sx={{ my: 2 }} />
-        <Paper sx={{ p: 3, borderLeft: '6px solid #E31837', maxHeight: 350, overflow: 'auto', background: '#fafbfc', width: '100%' }}>
-          <Typography variant="h6" sx={{ color: '#E31837', mb: 2 }}>Notes</Typography>
-          <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+        <Divider className="my-6" />
+        <Paper className="p-6 border-l-8 border-appleAccent max-h-96 overflow-auto bg-white/40 w-full rounded-xl">
+          <Typography variant="h6" className="text-appleAccent mb-4">Notes</Typography>
+          <Box className="flex gap-2 mb-2">
             <TextField
               fullWidth
               size="small"
@@ -403,14 +401,14 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
               onChange={e => setNoteInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleAddNote(); }}
             />
-            <Button variant="contained" sx={{ bgcolor: '#E31837' }} onClick={handleAddNote}>Add</Button>
+            <Button variant="contained" className="bg-appleAccent" onClick={handleAddNote}>Add</Button>
           </Box>
-          <Box sx={{ maxHeight: 220, overflowY: 'auto', pr: 1 }}>
+          <Box className="max-h-64 overflow-y-auto pr-2">
             {notes.length === 0 && <Typography color="text.secondary">No notes yet.</Typography>}
             {notes.map(note => (
-              <Paper key={note.id} sx={{ p: 2, mb: 2, background: '#fff7f7', borderLeft: '4px solid #E31837' }}>
-                <Typography variant="body2" sx={{ fontWeight: 500 }}>{note.text}</Typography>
-                <Typography variant="caption" color="text.secondary">{note?.created_at || note?.date} — {note?.author_email || note?.author || 'Unknown'}</Typography>
+              <Paper key={note.id} className="p-2 mb-2 bg-white/80 border-l-4 border-appleAccent">
+                <Typography className="font-medium">{note.text}</Typography>
+                <Typography className="text-sm text-gray-500">{note?.created_at || note?.date} — {note?.author_email || note?.author || 'Unknown'}</Typography>
               </Paper>
             ))}
           </Box>

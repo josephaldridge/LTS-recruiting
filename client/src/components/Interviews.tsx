@@ -163,9 +163,9 @@ const Interviews: React.FC = () => {
   };
 
   return (
-    <Box>
+    <Box className="bg-appleGlass backdrop-blur-md rounded-2xl shadow-glass border border-appleBorder p-6">
+      <Typography variant="h4" className="text-3xl font-semibold mb-4 text-gray-900 tracking-tight">Interviews</Typography>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-        <Typography variant="h4">Interviews</Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}

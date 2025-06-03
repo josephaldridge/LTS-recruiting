@@ -44,10 +44,8 @@ const Reports: React.FC = () => {
   };
 
   return (
-    <Box>
-      <Typography variant="h4" sx={{ mb: 4 }}>
-        Recruitment Reports
-      </Typography>
+    <Box className="bg-appleGlass backdrop-blur-md rounded-2xl shadow-glass border border-appleBorder p-6">
+      <Typography variant="h4" className="text-3xl font-semibold mb-4 text-gray-900 tracking-tight">Reports</Typography>
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
           <Card 

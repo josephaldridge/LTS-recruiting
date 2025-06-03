@@ -189,7 +189,7 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
   };
 
   return (
-    <Box className="bg-appleGlass backdrop-blur-md rounded-2xl shadow-glass border border-appleBorder p-6">
+    <Box className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-glass border border-blue-100 p-6 w-full max-w-7xl mx-auto">
       <Box className="flex flex-col mb-6">
         <Typography variant="h4" className="text-3xl font-semibold mb-4 text-gray-900 tracking-tight">Candidates</Typography>
         <Button

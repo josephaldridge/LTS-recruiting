@@ -33,32 +33,24 @@ const Navigation: React.FC = () => {
   const location = useLocation();
 
   return (
-    <nav className="bg-appleGlass backdrop-blur-md rounded-2xl shadow-glass border border-appleBorder p-6 flex flex-col gap-4 min-h-screen">
-      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-        <img src={icon} alt="Liberty Tax" style={{ width: 40, height: 40 }} />
-        <Box>
-          <Typography variant="h6" sx={{ color: 'white' }}>
-            Liberty Tax
-          </Typography>
-          <Typography variant="subtitle2" sx={{ color: 'white' }}>
-            Recruiting System
-          </Typography>
-        </Box>
+    <nav className="flex flex-col gap-2 h-full">
+      <Box className="flex items-center gap-3 mb-8">
+        <img src={icon} alt="Liberty Tax" className="w-10 h-10" />
+        <div>
+          <Typography variant="h6" className="text-blue-900 font-bold">Liberty Tax</Typography>
+          <Typography variant="subtitle2" className="text-blue-700">Recruiting System</Typography>
+        </div>
       </Box>
-      <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.12)' }} />
-      <List>
+      <Divider className="bg-blue-200 mb-4" />
+      <List className="flex-1 flex flex-col gap-1">
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
             <ListItemButton
               onClick={() => navigate(item.path)}
-              sx={{
-                backgroundColor: location.pathname === item.path ? 'rgba(255, 255, 255, 0.08)' : 'transparent',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.12)',
-                },
-              }}
+              className={`rounded-lg px-4 py-2 flex items-center gap-3 transition font-medium text-blue-900 hover:bg-blue-100/70 ${location.pathname === item.path ? 'bg-blue-200/80 shadow' : ''}`}
+              aria-current={location.pathname === item.path ? 'page' : undefined}
             >
-              <ListItemIcon sx={{ color: 'white' }}>{item.icon}</ListItemIcon>
+              <ListItemIcon className="text-blue-700 min-w-0 mr-2">{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItemButton>
           </ListItem>

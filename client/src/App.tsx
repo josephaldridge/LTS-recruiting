@@ -57,30 +57,23 @@ function App() {
       <CssBaseline />
       <Router>
         <LogoutButton user={user} />
-        <div className="min-h-screen bg-gradient-to-br from-appleGray to-white font-sans">
-          <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <div className="col-span-2 md:col-span-2 lg:col-span-2">
-                <div className="bg-appleGlass backdrop-blur-md rounded-2xl shadow-glass border border-appleBorder p-8 mb-8">
-                  <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-                    <Navigation />
-                    <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-                      <Routes>
-                        <Route path="/" element={<Dashboard />} />
-                        <Route path="/candidates" element={<Candidates user={user} />} />
-                        <Route path="/candidates/:id" element={<CandidateProfile user={user} />} />
-                        <Route path="/interviews" element={<Interviews />} />
-                        <Route path="/reports" element={<Reports />} />
-                      </Routes>
-                    </Box>
-                  </Box>
-                </div>
-              </div>
-              <div className="hidden lg:block">
-                <div className="bg-appleGlass backdrop-blur-md rounded-2xl shadow-glass border border-appleBorder p-8">
-                  {/* Sidebar or extra info */}
-                </div>
-              </div>
+        <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-appleGray to-white font-sans flex">
+          {/* Sidebar */}
+          <div className="hidden md:flex flex-col w-64 h-full bg-gradient-to-b from-blue-200/70 to-blue-400/60 backdrop-blur-xl border-r border-blue-100 shadow-xl p-6">
+            <Navigation />
+          </div>
+          {/* Main Content */}
+          <div className="flex-1 flex flex-col min-h-screen">
+            <div className="flex-1 flex flex-col p-4 md:p-8">
+              <Box component="main" className="flex-1 flex flex-col w-full">
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/candidates" element={<Candidates user={user} />} />
+                  <Route path="/candidates/:id" element={<CandidateProfile user={user} />} />
+                  <Route path="/interviews" element={<Interviews />} />
+                  <Route path="/reports" element={<Reports />} />
+                </Routes>
+              </Box>
             </div>
           </div>
         </div>

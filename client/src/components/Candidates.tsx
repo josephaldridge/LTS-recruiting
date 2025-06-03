@@ -102,6 +102,7 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
     state: '',
     resume: null as File | null,
   });
+  const [emailError, setEmailError] = useState('');
 
   useEffect(() => {
     const fetchCandidates = async () => {
@@ -136,6 +137,7 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
 
   const handleAddCandidate = async () => {
     try {
+      setEmailError('');
       if (!newCandidate.position) {
         alert('Position is required');
         return;
@@ -152,8 +154,12 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
       setNewCandidate({
         name: '', email: '', phone: '', department: '', position: '', city: '', state: '', resume: null,
       });
-    } catch (err) {
-      alert('Failed to add candidate.');
+    } catch (err: any) {
+      if (err.response && err.response.status === 409 && err.response.data?.error === 'Email already exists') {
+        setEmailError('Email already exists');
+      } else {
+        alert('Failed to add candidate.');
+      }
     }
   };
 
@@ -301,7 +307,7 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
             <TextField label="Name" fullWidth value={newCandidate.name} onChange={e => setNewCandidate({ ...newCandidate, name: e.target.value })} />
-            <TextField label="Email" fullWidth value={newCandidate.email} onChange={e => setNewCandidate({ ...newCandidate, email: e.target.value })} />
+            <TextField label="Email" fullWidth value={newCandidate.email} onChange={e => { setNewCandidate({ ...newCandidate, email: e.target.value }); setEmailError(''); }} error={!!emailError} helperText={emailError} />
             <TextField label="Phone" fullWidth value={newCandidate.phone} onChange={e => setNewCandidate({ ...newCandidate, phone: e.target.value })} />
             <FormControl fullWidth>
               <InputLabel>Department</InputLabel>

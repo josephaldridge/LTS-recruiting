@@ -75,6 +75,12 @@ router.post('/', upload.single('resume'), (req, res) => {
                 state
             } = body;
 
+            // Check for duplicate email
+            const existing = await pool.query('SELECT id FROM candidates WHERE email = $1', [email]);
+            if (existing.rows.length > 0) {
+                return res.status(409).json({ error: 'Email already exists' });
+            }
+
             // Optionally handle resume file
             let resumeFileInfo = null;
             if (req.file) {

@@ -315,27 +315,20 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
   if (!candidate) return <Typography>Candidate not found.</Typography>;
 
   return (
-    <Box className="w-full mx-auto mt-8">
+    <Box className="w-full max-w-6xl mx-auto mt-4 px-2 sm:px-4 md:px-8">
       <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} className="mb-4 bg-white/40 hover:bg-white/60 text-gray-900 rounded-full px-6 py-2 font-medium transition shadow">
         Back
       </Button>
-      <Paper className="p-8 rounded-2xl shadow-glass border border-blue-100 bg-white/80 backdrop-blur-lg w-full">
+      <Paper className="p-10 rounded-3xl shadow-2xl border border-blue-100 bg-gradient-to-br from-white/80 via-white/60 to-blue-50/60 backdrop-blur-2xl w-full relative">
+        {/* Accent Bar */}
+        <Box className="absolute left-0 top-0 w-full h-2 rounded-t-3xl bg-gradient-to-r from-appleAccent to-blue-400 opacity-80" />
         {/* Summary Bar */}
-        <Box className="flex items-center gap-8 mb-6 flex-wrap">
-          <Avatar className="w-20 h-20 mr-6 text-4xl bg-white/60 text-gray-900 shadow">{candidate?.name?.[0]}</Avatar>
-          <Box className="flex-1 flex flex-wrap gap-8">
+        <Box className="flex items-center gap-8 mb-8 flex-wrap relative z-10">
+          <Avatar className="w-24 h-24 mr-8 text-5xl bg-white/60 text-gray-900 shadow-lg border-4 border-white">{candidate?.name?.[0]}</Avatar>
+          <Box className="flex-1 flex flex-wrap gap-10 items-center">
             <Box>
-              <Typography variant="subtitle2">Name</Typography>
-              {editMode ? (
-                <TextField
-                  label="Name"
-                  value={editCandidate?.name || ''}
-                  onChange={e => handleEditChange('name', e.target.value)}
-                  size="small"
-                />
-              ) : (
-                <Typography variant="h6">{candidate?.name || 'N/A'}</Typography>
-              )}
+              <Typography variant="h4" className="font-bold text-gray-900 mb-1">{candidate?.name || 'N/A'}</Typography>
+              <Typography variant="subtitle2" className="text-gray-500">Candidate Profile</Typography>
             </Box>
             <Box>
               <Typography variant="subtitle2">Email</Typography>
@@ -424,48 +417,48 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
               )}
             </Box>
           </Box>
-          <Box className="flex gap-4 items-center ml-auto">
+          <Box className="flex flex-col gap-3 items-end ml-auto">
             <Button
               variant="contained"
               startIcon={<EmailIcon />}
-              className="bg-appleAccent hover:bg-blue-600 rounded-full px-6 py-2 text-white font-medium transition shadow"
+              className="bg-appleAccent hover:bg-blue-600 rounded-full px-7 py-2 text-white font-semibold text-lg shadow-lg"
               onClick={handleOpenEmailModal}
             >
               Send Email
             </Button>
             {!editMode ? (
-              <Button variant="contained" onClick={() => setEditMode(true)}>Edit</Button>
+              <Button variant="contained" className="rounded-full px-7 py-2 bg-blue-500 hover:bg-blue-700 text-white font-semibold shadow" onClick={() => setEditMode(true)}>Edit</Button>
             ) : (
-              <Button variant="contained" color="success" onClick={handleSave}>Save</Button>
+              <Button variant="contained" color="success" className="rounded-full px-7 py-2 font-semibold shadow" onClick={handleSave}>Save</Button>
             )}
             {editMode && (
-              <Button variant="outlined" color="inherit" onClick={() => { setEditMode(false); setEditCandidate(candidate); }}>Cancel</Button>
+              <Button variant="outlined" color="inherit" className="rounded-full px-7 py-2 font-semibold shadow" onClick={() => { setEditMode(false); setEditCandidate(candidate); }}>Cancel</Button>
             )}
           </Box>
         </Box>
-        <Divider className="my-6" />
-        <Box className="mb-4">
+        <Divider className="my-8" />
+        <Box className="mb-6">
           <Typography variant="subtitle2">Resume</Typography>
           {resume ? (
             <Box className="flex gap-4 items-center">
-              <Button variant="outlined" onClick={() => window.open(resume, '_blank')}>View Resume</Button>
-              <Button variant="outlined" component="label">
+              <Button variant="outlined" className="rounded-full border-appleAccent text-appleAccent font-semibold shadow" onClick={() => window.open(resume, '_blank')}>View Resume</Button>
+              <Button variant="outlined" component="label" className="rounded-full border-appleAccent text-appleAccent font-semibold shadow">
                 Upload Resume
                 <input type="file" hidden onChange={handleReplaceResume} />
               </Button>
-              <Button color="error" onClick={handleDeleteResume}>Delete Resume</Button>
+              <Button color="error" className="rounded-full font-semibold shadow" onClick={handleDeleteResume}>Delete Resume</Button>
             </Box>
           ) : (
-            <Button variant="outlined" component="label">
+            <Button variant="outlined" component="label" className="rounded-full border-appleAccent text-appleAccent font-semibold shadow">
               Upload Resume
               <input type="file" hidden onChange={handleReplaceResume} />
             </Button>
           )}
           {resumeError && <Typography color="error">{resumeError}</Typography>}
         </Box>
-        <Divider className="my-6" />
-        <Paper className="p-6 border-l-8 border-appleAccent max-h-96 overflow-auto bg-white/40 w-full rounded-xl">
-          <Typography variant="h6" className="text-appleAccent mb-4">Notes</Typography>
+        <Divider className="my-8" />
+        <Paper className="p-8 border-l-8 border-appleAccent max-h-96 overflow-auto bg-white/40 w-full rounded-xl shadow">
+          <Typography variant="h6" className="text-appleAccent mb-4 font-semibold">Notes</Typography>
           <Box className="flex gap-2 mb-2">
             <TextField
               fullWidth
@@ -475,7 +468,7 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ user }) => {
               onChange={e => setNoteInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleAddNote(); }}
             />
-            <Button variant="contained" className="bg-appleAccent" onClick={handleAddNote}>Add</Button>
+            <Button variant="contained" className="bg-appleAccent rounded-full font-semibold shadow" onClick={handleAddNote}>Add</Button>
           </Box>
           <Box className="max-h-64 overflow-y-auto pr-2">
             {notes.length === 0 && <Typography color="text.secondary">No notes yet.</Typography>}

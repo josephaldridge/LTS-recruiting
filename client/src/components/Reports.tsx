@@ -13,10 +13,8 @@ import {
   TableRow,
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import axios from 'axios';
+import axiosInstance from '../utils/axios';
 import { useNavigate } from 'react-router-dom';
-
-const API_BASE = process.env.REACT_APP_API_URL || '';
 
 const Reports: React.FC = () => {
   const [stats, setStats] = useState<any>({});
@@ -26,9 +24,9 @@ const Reports: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const statsRes = await axios.get(`${API_BASE}/api/reports/stats`);
+        const statsRes = await axiosInstance.get('/api/reports/stats');
         setStats(statsRes.data);
-        const hiresRes = await axios.get(`${API_BASE}/api/reports/recent-hires`);
+        const hiresRes = await axiosInstance.get('/api/reports/recent-hires');
         setRecentHires(hiresRes.data);
       } catch (err) {
         setStats({});

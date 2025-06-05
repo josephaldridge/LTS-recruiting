@@ -32,9 +32,7 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 import dayjs from 'dayjs';
-import axios from 'axios';
-
-const API_BASE = process.env.REACT_APP_API_URL || '';
+import axiosInstance from '../utils/axios';
 
 const statusColors = {
   'Scheduled': 'primary',
@@ -64,7 +62,7 @@ const Interviews: React.FC = () => {
     const fetchInterviews = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${API_BASE}/api/interviews`);
+        const res = await axiosInstance.get('/api/interviews');
         setInterviews(res.data);
       } catch (err) {
         setInterviews([]);
@@ -77,7 +75,7 @@ const Interviews: React.FC = () => {
   useEffect(() => {
     const fetchCandidates = async () => {
       try {
-        const res = await axios.get(`${API_BASE}/api/candidates`);
+        const res = await axiosInstance.get('/api/candidates');
         setCandidates(res.data);
       } catch (err) {
         setCandidates([]);
@@ -89,7 +87,7 @@ const Interviews: React.FC = () => {
   useEffect(() => {
     const fetchInterviewers = async () => {
       try {
-        const res = await axios.get(`${API_BASE}/api/interviewers`);
+        const res = await axiosInstance.get('/api/interviewers');
         setInterviewers(res.data);
       } catch (err) {
         setInterviewers([]);
@@ -145,9 +143,9 @@ const Interviews: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
-      await axios.post(`${API_BASE}/api/interviews`, formData);
+      await axiosInstance.post('/api/interviews', formData);
       // Refresh interviews list
-      const res = await axios.get(`${API_BASE}/api/interviews`);
+      const res = await axiosInstance.get('/api/interviews');
       setInterviews(res.data);
       setOpenDialog(false);
       setFormData({

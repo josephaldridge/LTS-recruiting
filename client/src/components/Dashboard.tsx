@@ -26,12 +26,9 @@ import {
   Assignment as AssignmentIcon,
   Send as SendIcon,
 } from '@mui/icons-material';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import axiosInstance from '../utils/axios';
-
-const API_BASE = process.env.REACT_APP_API_URL || '';
 
 const departments = [
   { label: 'Technical Support', value: 'technical', display: 'Tier 1 Technical Support Representative' },

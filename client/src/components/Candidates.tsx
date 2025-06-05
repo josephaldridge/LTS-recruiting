@@ -213,7 +213,6 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
           }}
           renderInput={(params) => <TextField {...params} label="Search Candidates" variant="outlined" />}
           loading={loading}
-          freeSolo
           sx={{ width: 300 }}
         />
         <TextField

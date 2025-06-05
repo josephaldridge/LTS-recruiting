@@ -23,6 +23,7 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Autocomplete,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -108,6 +109,7 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
     resume: null as File | null,
   });
   const [emailError, setEmailError] = useState('');
+  const [selectedCandidate, setSelectedCandidate] = useState<any>(null);
 
   useEffect(() => {
     const fetchCandidates = async () => {
@@ -202,6 +204,17 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
         </Button>
       </Box>
       <Box className="mb-4 flex gap-4">
+        <Autocomplete
+          options={candidates}
+          getOptionLabel={(option) => option.name}
+          value={selectedCandidate}
+          onChange={(event, newValue) => {
+            setSelectedCandidate(newValue);
+          }}
+          renderInput={(params) => <TextField {...params} label="Search Candidates" variant="outlined" />}
+          loading={loading}
+          sx={{ width: 300 }}
+        />
         <TextField
           select
           label="Filter by Department"
@@ -227,22 +240,20 @@ const Candidates: React.FC<CandidatesProps> = ({ user }) => {
           ))}
         </TextField>
       </Box>
-      <Paper className="mb-6 p-3 bg-white/30 rounded-xl shadow border border-appleBorder">
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="Search candidates..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Paper>
+      <TextField
+        fullWidth
+        variant="outlined"
+        placeholder="Search candidates..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon />
+            </InputAdornment>
+          ),
+        }}
+      />
       <TableContainer component={Paper} className="bg-white/30 rounded-xl shadow border border-appleBorder">
         <Table>
           <TableHead>
